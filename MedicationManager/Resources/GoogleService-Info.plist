@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>940295349030-dei0k7ia2lfetdlqac08bhqj18ru5ejd.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.940295349030-dei0k7ia2lfetdlqac08bhqj18ru5ejd</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDZ5RDRhsmpdfG6Ih0wsz6ecnxXIVttpbo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>940295349030</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.medicationmanager.MedicationManager</string>
+	<key>PROJECT_ID</key>
+	<string>mango-ca9be</string>
+	<key>STORAGE_BUCKET</key>
+	<string>mango-ca9be.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:940295349030:ios:a25f9322ec08c0b7ab97e7</string>
+</dict>
+</plist>
