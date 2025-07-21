@@ -2,7 +2,7 @@ import Foundation
 import FirebaseFirestore
 
 // MARK: - Caregiver Access Management
-struct CaregiverAccess: Codable {
+struct CaregiverAccess: Codable, Sendable {
     var enabled: Bool = false
     var caregivers: [CaregiverInfo] = []
     var maxCaregivers: Int = Configuration.App.maxCaregivers
@@ -52,7 +52,7 @@ struct CaregiverAccess: Codable {
 }
 
 // MARK: - Caregiver Info
-struct CaregiverInfo: Codable, Identifiable {
+struct CaregiverInfo: Codable, Identifiable, Sendable {
     let id: String = UUID().uuidString
     let caregiverId: String
     let caregiverEmail: String
@@ -62,6 +62,12 @@ struct CaregiverInfo: Codable, Identifiable {
     var permissions: [Permission] = [.myhealth, .doctorlist]
     var notificationsEnabled: Bool = true
     var isActive: Bool = true
+    
+    // MARK: - Codable
+    enum CodingKeys: String, CodingKey {
+        case caregiverId, caregiverEmail, caregiverName, accessLevel, grantedAt
+        case permissions, notificationsEnabled, isActive
+    }
     
     var displayName: String {
         if caregiverName.isEmpty {
@@ -99,7 +105,7 @@ struct CaregiverInfo: Codable, Identifiable {
 }
 
 // MARK: - Access Level
-enum AccessLevel: String, Codable {
+enum AccessLevel: String, Codable, Sendable {
     case readonly = "readonly"
     // Future: Could add "edit" permissions
     
@@ -119,11 +125,12 @@ enum AccessLevel: String, Codable {
 }
 
 // MARK: - Permissions
-enum Permission: String, Codable, CaseIterable {
+enum Permission: String, Codable, CaseIterable, Sendable {
     case myhealth = "myhealth"
     case doctorlist = "doctorlist"
     case groups = "groups"
     case conflicts = "conflicts"
+    case dataManagement = "dataManagement"
     
     var displayName: String {
         switch self {
@@ -135,6 +142,8 @@ enum Permission: String, Codable, CaseIterable {
             return "Groups"
         case .conflicts:
             return "Conflicts"
+        case .dataManagement:
+            return "Data Management"
         }
     }
     
@@ -148,6 +157,8 @@ enum Permission: String, Codable, CaseIterable {
             return "Access to family group settings"
         case .conflicts:
             return "Access to medication conflict reports"
+        case .dataManagement:
+            return "Ability to manage and clear user data"
         }
     }
     
@@ -161,6 +172,8 @@ enum Permission: String, Codable, CaseIterable {
             return "person.3.fill"
         case .conflicts:
             return "exclamationmark.triangle.fill"
+        case .dataManagement:
+            return "trash.fill"
         }
     }
     
@@ -170,7 +183,7 @@ enum Permission: String, Codable, CaseIterable {
 }
 
 // MARK: - Caregiver Invitation
-struct CaregiverInvitation: Codable {
+struct CaregiverInvitation: Codable, Sendable {
     let id: String = UUID().uuidString
     let inviterId: String
     let inviterName: String
@@ -182,6 +195,12 @@ struct CaregiverInvitation: Codable {
     let createdAt: Date
     var isAccepted: Bool = false
     var acceptedAt: Date?
+    
+    // MARK: - Codable
+    enum CodingKeys: String, CodingKey {
+        case inviterId, inviterName, inviterEmail, caregiverEmail, permissions
+        case invitationCode, expiresAt, createdAt, isAccepted, acceptedAt
+    }
     
     var isExpired: Bool {
         return Date() > expiresAt
@@ -214,8 +233,8 @@ struct CaregiverInvitation: Codable {
     }
     
     private static func generateInvitationCode() -> String {
-        let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        return String((0..<8).map { _ in characters.randomElement()! })
+        let code = Int.random(in: 100000...999999)
+        return String(code)
     }
 }
 

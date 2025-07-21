@@ -6,7 +6,9 @@ protocol SyncableModel {
     var id: String { get }
     var updatedAt: Date { get set }
     var needsSync: Bool { get set }
-    var isDeleted: Bool { get set }
+    var isDeletedFlag: Bool { get set }
+    mutating func markForSync()
+    
 }
 
 protocol VoiceInputCapable {
@@ -29,7 +31,7 @@ extension SyncableModel {
     }
     
     mutating func markDeleted() {
-        isDeleted = true
+        isDeletedFlag = true
         markForSync()
     }
 }

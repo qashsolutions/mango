@@ -2,8 +2,9 @@ import SwiftUI
 import Contacts
 
 struct DoctorListView: View {
-    @StateObject private var viewModel = DoctorListViewModel()
-    @StateObject private var navigationManager = NavigationManager.shared
+    @State private var viewModel = DoctorListViewModel()
+    // Use singleton directly - it manages its own lifecycle with @Observable
+    private let navigationManager = NavigationManager.shared
     @State private var searchText: String = ""
     @State private var showingAddOptions: Bool = false
     @State private var showingContactImport: Bool = false
@@ -47,7 +48,7 @@ struct DoctorListView: View {
                         
                         Button(action: { showingAddOptions = true }) {
                             Image(systemName: AppIcons.plus)
-                                .font(.system(size: 18, weight: .medium))
+                                .font(AppTheme.Typography.callout)
                         }
                     }
                 }
@@ -89,7 +90,7 @@ struct DoctorListView: View {
         }
     }
     
-    private var filteredDoctors: [Doctor] {
+    private var filteredDoctors: [DoctorModel] {
         if searchText.isEmpty {
             return viewModel.doctors
         } else {
@@ -105,11 +106,11 @@ struct DoctorListView: View {
 
 // MARK: - Doctor List Content
 struct DoctorListContent: View {
-    let doctors: [Doctor]
+    let doctors: [DoctorModel]
     @Binding var searchText: String
-    let onDoctorTap: (Doctor) -> Void
-    let onEditDoctor: (Doctor) -> Void
-    let onContactDoctor: (Doctor) -> Void
+    let onDoctorTap: (DoctorModel) -> Void
+    let onEditDoctor: (DoctorModel) -> Void
+    let onContactDoctor: (DoctorModel) -> Void
     
     var body: some View {
         VStack(spacing: 0) {
@@ -142,14 +143,14 @@ struct DoctorListContent: View {
         }
     }
     
-    private var groupedDoctors: [String: [Doctor]] {
+    private var groupedDoctors: [String: [DoctorModel]] {
         Dictionary(grouping: doctors) { $0.specialty }
     }
 }
 
 // MARK: - Doctor Statistics Header
 struct DoctorStatisticsHeader: View {
-    let doctors: [Doctor]
+    let doctors: [DoctorModel]
     
     private var statistics: DoctorStatistics {
         DoctorStatistics(doctors: doctors)
@@ -208,7 +209,7 @@ struct StatisticItem: View {
     var body: some View {
         VStack(spacing: AppTheme.Spacing.small) {
             Image(systemName: icon)
-                .font(.system(size: 16, weight: .medium))
+                .font(AppTheme.Typography.body)
                 .foregroundColor(color)
             
             Text(value)
@@ -226,7 +227,7 @@ struct StatisticItem: View {
 
 // MARK: - Recent Doctors Section
 struct RecentDoctorsSection: View {
-    let doctors: [Doctor]
+    let doctors: [DoctorModel]
     
     var body: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
@@ -248,7 +249,7 @@ struct RecentDoctorsSection: View {
 }
 
 struct RecentDoctorCard: View {
-    let doctor: Doctor
+    let doctor: DoctorModel
     
     var body: some View {
         VStack(spacing: AppTheme.Spacing.small) {
@@ -256,9 +257,9 @@ struct RecentDoctorCard: View {
             Text(doctor.initials)
                 .font(AppTheme.Typography.headline)
                 .foregroundColor(AppTheme.Colors.onPrimary)
-                .frame(width: 40, height: 40)
+                .frame(width: AppTheme.Sizing.iconMedium, height: AppTheme.Sizing.iconMedium)
                 .background(AppTheme.Colors.primary)
-                .cornerRadius(20)
+                .cornerRadius(AppTheme.CornerRadius.extraLarge)
             
             VStack(spacing: AppTheme.Spacing.extraSmall) {
                 Text(doctor.displayName)
@@ -278,7 +279,7 @@ struct RecentDoctorCard: View {
 
 // MARK: - Doctor Row
 struct DoctorRow: View {
-    let doctor: Doctor
+    let doctor: DoctorModel
     let onTap: () -> Void
     let onEdit: () -> Void
     let onContact: () -> Void
@@ -290,7 +291,7 @@ struct DoctorRow: View {
                 Text(doctor.initials)
                     .font(AppTheme.Typography.subheadline)
                     .foregroundColor(AppTheme.Colors.onPrimary)
-                    .frame(width: 44, height: 44)
+                    .frame(width: AppTheme.Sizing.iconMedium, height: AppTheme.Sizing.iconMedium)
                     .background(AppTheme.Colors.primary)
                     .cornerRadius(22)
                 
@@ -308,7 +309,7 @@ struct DoctorRow: View {
                         
                         if doctor.isImportedFromContacts {
                             Image(systemName: AppIcons.contactImported)
-                                .font(.system(size: 10))
+                                .font(AppTheme.Typography.caption)
                                 .foregroundColor(AppTheme.Colors.success)
                         }
                     }
@@ -327,7 +328,7 @@ struct DoctorRow: View {
                     if doctor.hasContactInfo {
                         Button(action: onContact) {
                             Image(systemName: AppIcons.phone)
-                                .font(.system(size: 16))
+                                .font(AppTheme.Typography.body)
                                 .foregroundColor(AppTheme.Colors.primary)
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -335,7 +336,7 @@ struct DoctorRow: View {
                     
                     Button(action: onEdit) {
                         Image(systemName: AppIcons.edit)
-                            .font(.system(size: 16))
+                            .font(AppTheme.Typography.body)
                             .foregroundColor(AppTheme.Colors.secondary)
                     }
 
@@ -374,7 +375,7 @@ struct ContactImportView: View {
     @State private var searchText: String = ""
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 if isLoading {
                     LoadingState(message: AppStrings.Doctors.loadingContacts)
@@ -492,9 +493,9 @@ struct ContactRow: View {
                 Text(contactInitials)
                     .font(AppTheme.Typography.subheadline)
                     .foregroundColor(AppTheme.Colors.onSecondary)
-                    .frame(width: 40, height: 40)
+                    .frame(width: AppTheme.Sizing.iconMedium, height: AppTheme.Sizing.iconMedium)
                     .background(AppTheme.Colors.secondary)
-                    .cornerRadius(20)
+                    .cornerRadius(AppTheme.CornerRadius.extraLarge)
                 
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.extraSmall) {
                     Text("\(contact.givenName) \(contact.familyName)")
@@ -517,14 +518,14 @@ struct ContactRow: View {
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12))
+                    .font(AppTheme.Typography.caption)
                     .foregroundColor(AppTheme.Colors.tertiaryText)
             }
             .padding(.vertical, AppTheme.Spacing.extraSmall)
         }
         .buttonStyle(PlainButtonStyle())
         .confirmationDialog(AppStrings.Doctors.selectSpecialty, isPresented: $showingSpecialtyPicker) {
-            ForEach(Doctor.CommonSpecialty.sortedCases, id: \.self) { specialty in
+            ForEach(DoctorModel.CommonSpecialty.sortedCases, id: \.self) { specialty in
                 Button(specialty.rawValue) {
                     onSelect(contact, specialty.rawValue)
                 }
@@ -543,7 +544,7 @@ struct ContactRow: View {
 
 // MARK: - Doctor Statistics
 struct DoctorStatistics {
-    let doctors: [Doctor]
+    let doctors: [DoctorModel]
     
     var totalDoctors: Int {
         doctors.count
@@ -557,7 +558,7 @@ struct DoctorStatistics {
         doctors.filter { $0.hasContactInfo }.count
     }
     
-    var recentlyAdded: [Doctor] {
+    var recentlyAdded: [DoctorModel] {
         let oneWeekAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
         return doctors.filter { $0.createdAt > oneWeekAgo }
             .sorted { $0.createdAt > $1.createdAt }

@@ -1,9 +1,10 @@
 import SwiftUI
-import CoreImage.CIFilterBuiltins
-import FirebaseAuth
+@preconcurrency import FirebaseAuth
+import CoreImage
 
 struct MFASetupView: View {
-    @State private var firebaseManager = FirebaseManager.shared
+    // iOS 18/Swift 6: Direct reference to @Observable singleton
+    private let firebaseManager = FirebaseManager.shared
     @State private var isLoading = false
     @State private var totpSecret: TOTPSecret?
     @State private var qrCodeURL = ""
@@ -12,6 +13,7 @@ struct MFASetupView: View {
     @State private var showBackupCodes = false
     @State private var showError = false
     @State private var errorMessage = ""
+    @Environment(\.dismiss) private var dismiss
     
     let onComplete: () -> Void
     
@@ -49,7 +51,7 @@ struct MFASetupView: View {
     private var headerSection: some View {
         VStack(spacing: AppTheme.Spacing.medium) {
             Image(systemName: "shield.checkered")
-                .font(.system(size: 64))
+                .font(AppTheme.Typography.largeTitle)
                 .foregroundStyle(AppTheme.Colors.primary)
             
             VStack(spacing: AppTheme.Spacing.small) {
@@ -120,6 +122,9 @@ struct MFASetupView: View {
                 .accessibilityLabel("MFA verification code input")
                 
                 Button {
+                    // Note: No [weak self] needed here because MFASetupView is a struct (value type).
+                    // SwiftUI views are designed as structs that get recreated frequently, so there's
+                    // no risk of retain cycles like with reference types (classes).
                     Task {
                         await finalizeMFASetup()
                     }
@@ -232,49 +237,63 @@ struct MFASetupView: View {
     }
     
     private func finalizeMFASetup() async {
-        guard let totpSecret = totpSecret else { return }
-        
-        isLoading = true
-        defer { isLoading = false }
-        
+            guard let totpSecret = totpSecret else { return }
+            
+            isLoading = true
+            defer { isLoading = false }
+            
         do {
-            try await firebaseManager.finalizeMFAEnrollment(
-                totpSecret: totpSecret,
-                totpCode: verificationCode,
-                displayName: "Authenticator App"
-            )
-            showBackupCodes = true
-        } catch {
-            errorMessage = error.localizedDescription
-            showError = true
-            verificationCode = ""
-        }
+                 // --- FIX IS HERE ---
+                 // Access the firebaseManager instance via the wrapper's wrappedValue
+                 // Call the finalizeMFAEnrollment method on the wrapped value.
+            try await (self.firebaseManager as FirebaseManager).finalizeMFAEnrollment( // <-- Corrected line
+                     totpSecret: totpSecret,
+                     totpCode: verificationCode, // Access local state directly
+                     displayName: "Authenticator App"
+                 )
+                 // --- Update local state on success ---
+                 showBackupCodes = true // Local state variable
+                 // --- Dismiss the view and call completion on success ---
+                 dismiss()
+                 onComplete() // Call the completion handler
+
+            } catch {
+                // --- Update local error state on failure ---
+                errorMessage = error.localizedDescription
+                // Local state variable
+                showError = true
+                // Local state variable to present alert
+                verificationCode = ""
+                // Clear verification code input on error
+            }
+        // The 'defer { isLoading = false }' handles clearing local isLoading when the function exits (successfully or due to error).
+         }
     }
     
-    private func generateQRCode(from string: String) -> UIImage? {
-        let context = CIContext()
-        let filter = CIFilter.qrCodeGenerator()
         
-        filter.message = Data(string.utf8)
-        filter.correctionLevel = "M"
-        
-        if let outputImage = filter.outputImage {
-            let transform = CGAffineTransform(scaleX: 10, y: 10)
-            let scaledImage = outputImage.transformed(by: transform)
+        private func generateQRCode(from string: String) -> UIImage? {
+            let context = CIContext()
+            guard let filter = CIFilter(name: "CIQRCodeGenerator") else { return nil }
             
-            if let cgImage = context.createCGImage(scaledImage, from: scaledImage.extent) {
-                return UIImage(cgImage: cgImage)
+            filter.setValue(Data(string.utf8), forKey: "inputMessage")
+            filter.setValue("M", forKey: "inputCorrectionLevel")
+            
+            if let outputImage = filter.outputImage {
+                let transform = CGAffineTransform(scaleX: 10, y: 10)
+                let scaledImage = outputImage.transformed(by: transform)
+                
+                if let cgImage = context.createCGImage(scaledImage, from: scaledImage.extent) {
+                    return UIImage(cgImage: cgImage)
+                }
             }
+            
+            return nil
         }
-        
-        return nil
-    }
-}
 
-#if DEBUG
-struct MFASetupView_Previews: PreviewProvider {
-    static var previews: some View {
-        MFASetupView(onComplete: {})
+    #if DEBUG
+    struct MFASetupView_Previews: PreviewProvider {
+        static var previews: some View {
+            MFASetupView(onComplete: {})
+        }
     }
-}
 #endif

@@ -2,12 +2,12 @@ import SwiftUI
 
 #if DEBUG
 struct TestingView: View {
-    @StateObject private var testRunner = SyncTestRunner()
+    @State private var testRunner = SyncTestRunner()
     @State private var showingResults: Bool = false
     @State private var selectedConfiguration: TestConfiguration = .standard
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: AppTheme.Spacing.large) {
                 // Test Status Header
                 TestStatusHeader(
@@ -92,7 +92,7 @@ struct TestStatusHeader: View {
             if isRunning && !currentTest.isEmpty {
                 HStack(spacing: AppTheme.Spacing.small) {
                     Image(systemName: "gear")
-                        .font(.system(size: 12))
+                        .font(AppTheme.Typography.caption)
                         .foregroundColor(AppTheme.Colors.primary)
                     
                     Text(currentTest)
@@ -128,7 +128,7 @@ struct RunningTestsView: View {
             
             VStack(spacing: AppTheme.Spacing.medium) {
                 Image(systemName: "gearshape.2")
-                    .font(.system(size: 48))
+                    .font(AppTheme.Typography.largeTitle)
                     .foregroundColor(AppTheme.Colors.primary)
                     .rotationEffect(.degrees(45))
                     .animation(.linear(duration: 2).repeatForever(autoreverses: false), value: true)
@@ -166,7 +166,7 @@ struct NoTestsView: View {
             
             VStack(spacing: AppTheme.Spacing.medium) {
                 Image(systemName: "checkmark.shield")
-                    .font(.system(size: 48))
+                    .font(AppTheme.Typography.largeTitle)
                     .foregroundColor(AppTheme.Colors.primary)
                 
                 Text("Sync Testing")
@@ -209,7 +209,7 @@ struct TestCapabilityRow: View {
     var body: some View {
         HStack(spacing: AppTheme.Spacing.medium) {
             Image(systemName: icon)
-                .font(.system(size: 16))
+                .font(AppTheme.Typography.body)
                 .foregroundColor(AppTheme.Colors.primary)
                 .frame(width: 24)
             
@@ -347,7 +347,7 @@ struct TestCategoryRow: View {
     var body: some View {
         HStack(spacing: AppTheme.Spacing.medium) {
             Image(systemName: categoryResult.success ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .font(.system(size: 16))
+                .font(AppTheme.Typography.body)
                 .foregroundColor(categoryResult.success ? AppTheme.Colors.success : AppTheme.Colors.error)
             
             VStack(alignment: .leading, spacing: AppTheme.Spacing.extraSmall) {
@@ -382,7 +382,7 @@ struct TestResultsDetailView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 ForEach(Dictionary(grouping: testResults) { $0.category }.keys.sorted(), id: \.self) { category in
                     Section(category) {
@@ -430,7 +430,7 @@ struct TestResultRow: View {
     var body: some View {
         HStack(spacing: AppTheme.Spacing.medium) {
             Image(systemName: result.statusIcon)
-                .font(.system(size: 16))
+                .font(AppTheme.Typography.body)
                 .foregroundColor(result.success ? AppTheme.Colors.success : AppTheme.Colors.error)
             
             VStack(alignment: .leading, spacing: AppTheme.Spacing.extraSmall) {

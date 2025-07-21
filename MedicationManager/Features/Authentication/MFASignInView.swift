@@ -1,8 +1,9 @@
 import SwiftUI
-import FirebaseAuth
+@preconcurrency import FirebaseAuth
 
 struct MFASignInView: View {
-    @State private var firebaseManager = FirebaseManager.shared
+    // iOS 18/Swift 6: Direct reference to @Observable singleton
+    private let firebaseManager = FirebaseManager.shared
     let resolver: MultiFactorResolver
     @State private var selectedFactorIndex = 0
     @State private var verificationCode = ""
@@ -45,7 +46,8 @@ struct MFASignInView: View {
     private var headerSection: some View {
         VStack(spacing: AppTheme.Spacing.medium) {
             Image(systemName: "lock.shield")
-                .font(.system(size: 64))
+                .font(AppTheme.Typography.largeTitle)
+                .scaleEffect(2.0)
                 .foregroundStyle(AppTheme.Colors.primary)
             
             VStack(spacing: AppTheme.Spacing.small) {
@@ -55,7 +57,7 @@ struct MFASignInView: View {
                     .foregroundStyle(AppTheme.Colors.onBackground)
                     .multilineTextAlignment(.center)
                 
-                Text("Please verify your identity using one of your registered methods.")
+                Text(AppStrings.Common.please(_:)("verify your identity using one of your registered methods."))
                     .font(AppTheme.Typography.callout)
                     .foregroundStyle(AppTheme.Colors.onSurface)
                     .multilineTextAlignment(.center)
@@ -142,7 +144,7 @@ struct MFASignInView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .frame(height: AppTheme.Layout.buttonHeight)
-                .background(verificationCode.count == 6 ? AppTheme.Colors.primary : AppTheme.Colors.secondary.opacity(0.6))
+                .background(verificationCode.count == 6 ? AppTheme.Colors.primary : AppTheme.Colors.secondary.opacity(AppTheme.Opacity.medium))
                 .foregroundStyle(AppTheme.Colors.onPrimary)
                 .cornerRadius(AppTheme.CornerRadius.medium)
                 .shadow(
@@ -192,7 +194,12 @@ struct MFASignInView: View {
         }
         
         do {
-            try await firebaseManager.verifyMFACode(verificationCode, resolver: resolver)
+        // Use the MFA resolver directly to verify the code
+        let assertion = TOTPMultiFactorGenerator.assertionForSignIn(
+            withEnrollmentID: resolver.hints.first?.uid ?? "",
+            oneTimePassword: verificationCode
+            )
+            _=try await resolver.resolveSignIn(with: assertion)
             onComplete()
         } catch {
             errorMessage = "Invalid code. Please try again."
@@ -208,7 +215,8 @@ struct MFASignInView_Previews: PreviewProvider {
         // Mock preview since we can't create a real MultiFactorResolver
         VStack(spacing: AppTheme.Spacing.large) {
             Image(systemName: "lock.shield")
-                .font(.system(size: 64))
+                .font(AppTheme.Typography.largeTitle)
+                .scaleEffect(2.0)
                 .foregroundStyle(AppTheme.Colors.primary)
             
             Text("MFA Sign-In Preview")

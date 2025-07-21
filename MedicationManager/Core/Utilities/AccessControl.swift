@@ -1,14 +1,20 @@
 import Foundation
-import FirebaseFirestore
+import Observation
+// MARK: - Swift 6 Compatibility
+// @preconcurrency is used for Firebase SDK compatibility with Swift 6's strict concurrency
+// Firebase SDK types don't yet conform to Sendable protocol
+// Remove @preconcurrency when Firebase SDK is updated with Sendable conformance
+@preconcurrency import FirebaseFirestore
 
 @MainActor
-class AccessControl: ObservableObject {
+@Observable
+final class AccessControl {
     static let shared = AccessControl()
     
-    @Published var caregiverAccess: CaregiverAccess = CaregiverAccess.create()
-    @Published var pendingInvitations: [CaregiverInvitation] = []
-    @Published var isLoading: Bool = false
-    @Published var accessError: AppError?
+    var caregiverAccess: CaregiverAccess = CaregiverAccess.create()
+    var pendingInvitations: [CaregiverInvitation] = []
+    var isLoading: Bool = false
+    var accessError: AppError?
     
     private let firestore = Firestore.firestore()
     private let authManager = FirebaseManager.shared
@@ -42,13 +48,21 @@ class AccessControl: ObservableObject {
     
     func saveCaregiverAccess(for userId: String) async throws {
         do {
-            let accessData = try JSONEncoder().encode(caregiverAccess)
-            let accessDict = try JSONSerialization.jsonObject(with: accessData) as? [String: Any] ?? [:]
-            
-            try await firestore.collection("users").document(userId).updateData([
-                "caregiverAccess": accessDict
-            ])
-            
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                do {
+                    // Create a wrapper object for the caregiverAccess field
+                    let updateData = CaregiverAccessWrapper(caregiverAccess: self.caregiverAccess)
+                    try self.firestore.collection("users").document(userId).setData(from: updateData, merge: true) { error in
+                        if let error = error {
+                            continuation.resume(throwing: error)
+                        } else {
+                            continuation.resume()
+                        }
+                    }
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
         } catch {
             accessError = AppError.caregiverAccessError(.saveFailed)
             throw error
@@ -97,10 +111,19 @@ class AccessControl: ObservableObject {
         
         do {
             // Save invitation to Firestore
-            let invitationData = try JSONEncoder().encode(invitation)
-            let invitationDict = try JSONSerialization.jsonObject(with: invitationData) as? [String: Any] ?? [:]
-            
-            try await firestore.collection("caregiverInvitations").document(invitation.id).setData(invitationDict)
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                do {
+                    try self.firestore.collection("caregiverInvitations").document(invitation.id).setData(from: invitation) { error in
+                        if let error = error {
+                            continuation.resume(throwing: error)
+                        } else {
+                            continuation.resume()
+                        }
+                    }
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
             
             // Add to pending invitations
             pendingInvitations.append(invitation)
@@ -140,10 +163,19 @@ class AccessControl: ObservableObject {
             acceptedInvitation.isAccepted = true
             acceptedInvitation.acceptedAt = Date()
             
-            let invitationData = try JSONEncoder().encode(acceptedInvitation)
-            let invitationDict = try JSONSerialization.jsonObject(with: invitationData) as? [String: Any] ?? [:]
-            
-            try await firestore.collection("caregiverInvitations").document(invitation.id).updateData(invitationDict)
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                do {
+                    try self.firestore.collection("caregiverInvitations").document(invitation.id).setData(from: acceptedInvitation, merge: true) { error in
+                        if let error = error {
+                            continuation.resume(throwing: error)
+                        } else {
+                            continuation.resume()
+                        }
+                    }
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
             
             // Remove from pending invitations
             pendingInvitations.removeAll { $0.id == invitation.id }
@@ -198,12 +230,21 @@ class AccessControl: ObservableObject {
     }
     
     private func saveCaregiverAccessDirectly(for userId: String, access: CaregiverAccess) async throws {
-        let accessData = try JSONEncoder().encode(access)
-        let accessDict = try JSONSerialization.jsonObject(with: accessData) as? [String: Any] ?? [:]
-        
-        try await firestore.collection("users").document(userId).updateData([
-            "caregiverAccess": accessDict
-        ])
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            do {
+                // Create a wrapper object for the caregiverAccess field
+                let updateData = CaregiverAccessWrapper(caregiverAccess: access)
+                try self.firestore.collection("users").document(userId).setData(from: updateData, merge: true) { error in
+                    if let error = error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume()
+                    }
+                }
+            } catch {
+                continuation.resume(throwing: error)
+            }
+        }
     }
     
     private func sendInvitationEmail(_ invitation: CaregiverInvitation) async throws {
@@ -325,6 +366,12 @@ extension AccessControl {
             availableSlots: caregiverAccess.maxCaregivers - caregiverAccess.activeCaregivers.count
         )
     }
+}
+
+// MARK: - Wrapper for Firestore Codable Support
+// This wrapper is needed to update nested fields in Firestore documents
+private struct CaregiverAccessWrapper: Codable {
+    let caregiverAccess: CaregiverAccess
 }
 
 // MARK: - Caregiver Access Summary

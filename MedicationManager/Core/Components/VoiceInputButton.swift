@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct VoiceInputButton: View {
-    let context: VoiceInputContext
+    let context: VoiceInteractionContext
     let onResult: (String) -> Void
     
-    @StateObject private var speechManager = SpeechManager.shared
+    @State private var speechManager = SpeechManager.shared
     @State private var isPressed: Bool = false
     @State private var showingPermissionAlert: Bool = false
     
@@ -70,7 +70,7 @@ struct VoiceInputButton: View {
         } message: {
             Text(AppStrings.Voice.permissionMessage)
         }
-        .onChange(of: speechManager.recognizedText) { _, newText in
+        .onChange(of: speechManager.recognizedText) { oldText, newText in
             if !newText.isEmpty && !speechManager.isRecording {
                 onResult(newText)
             }
@@ -85,14 +85,14 @@ struct VoiceInputButton: View {
     // MARK: - Computed Properties
     private var buttonSize: CGFloat {
         switch context {
-        case .medicationName, .doctorName, .foodName:
+        case .medicationName, .supplementName, .doctorName, .foodName:
             return 64
         case .dosage:
             return 56
         case .frequency, .notes:
             return 60
-        case .doctorSpecialty:
-            return 56
+        case .conflictQuery:
+            return 64
         case .general:
             return 68
         }
@@ -179,9 +179,9 @@ struct VoiceInputButton: View {
     
     private var shadowColor: Color {
         if speechManager.isRecording {
-            return AppTheme.Colors.voiceActive.opacity(0.3)
+            return AppTheme.Colors.voiceActive.opacity(AppTheme.Opacity.low)
         } else {
-            return Color.black.opacity(0.1)
+            return AppTheme.Colors.onBackground.opacity(AppTheme.Opacity.low)
         }
     }
     
@@ -223,7 +223,7 @@ struct VoiceInputButton: View {
                 }
             } catch {
                 AnalyticsManager.shared.trackVoiceInputError(
-                    context: context.analyticsName,
+                    context: context.rawValue,
                     errorType: error.localizedDescription
                 )
             }
@@ -254,35 +254,18 @@ struct VoiceInputButton: View {
 }
 
 // MARK: - Voice Input Context Extensions
-extension VoiceInputContext {
+extension VoiceInteractionContext {
     var analyticsName: String {
-        switch self {
-        case .medicationName:
-            return "medication_name"
-        case .dosage:
-            return "dosage"
-        case .frequency:
-            return "frequency"
-        case .notes:
-            return "notes"
-        case .doctorName:
-            return "doctor_name"
-        case .doctorSpecialty:
-            return "doctor_specialty"
-        case .foodName:
-            return "food_name"
-        case .general:
-            return "general"
-        }
+        return self.rawValue
     }
 }
 
 // MARK: - Compact Voice Input Button
 struct CompactVoiceInputButton: View {
-    let context: VoiceInputContext
+    let context: VoiceInteractionContext
     let onResult: (String) -> Void
     
-    @StateObject private var speechManager = SpeechManager.shared
+    @State private var speechManager = SpeechManager.shared
     
     var body: some View {
         Button(action: {
@@ -295,13 +278,13 @@ struct CompactVoiceInputButton: View {
             }
         }) {
             Image(systemName: speechManager.isRecording ? "mic.fill" : "mic")
-                .font(.system(size: 16, weight: .medium))
+                .font(AppTheme.Typography.body)
                 .foregroundColor(speechManager.isRecording ? AppTheme.Colors.voiceActive : AppTheme.Colors.primary)
         }
-        .frame(width: 32, height: 32)
+        .frame(width: AppTheme.Sizing.iconMedium, height: AppTheme.Sizing.iconMedium)
         .background(
             Circle()
-                .fill(speechManager.isRecording ? AppTheme.Colors.voiceActive.opacity(0.1) : Color.clear)
+                .fill(speechManager.isRecording ? AppTheme.Colors.voiceActive.opacity(AppTheme.Opacity.low) : Color.clear)
         )
         .disabled(!speechManager.isAuthorized)
         .onChange(of: speechManager.recognizedText) { _, newText in

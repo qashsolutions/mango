@@ -1,8 +1,8 @@
 import Foundation
 import FirebaseFirestore
 
-struct DietEntry: Codable, Identifiable, SyncableModel, VoiceInputCapable, UserOwnedModel {
-    let id: String = UUID().uuidString
+struct DietEntryModel: Codable, Identifiable, Sendable, SyncableModel, VoiceInputCapable, UserOwnedModel {
+    let id: String
     let userId: String
     var mealType: MealType
     var foods: [FoodItem]
@@ -13,11 +13,49 @@ struct DietEntry: Codable, Identifiable, SyncableModel, VoiceInputCapable, UserO
     let date: Date
     let createdAt: Date
     var updatedAt: Date
-    var voiceEntryUsed: Bool = false
+    var voiceEntryUsed: Bool
     
     // Sync properties
-    var needsSync: Bool = false
-    var isDeleted: Bool = false
+    var needsSync: Bool
+    var isDeletedFlag: Bool
+    
+    // MARK: - Initializer
+    init(id: String = UUID().uuidString,
+         userId: String,
+         mealType: MealType,
+         foods: [FoodItem],
+         allergies: [String],
+         notes: String? = nil,
+         scheduledTime: Date? = nil,
+         actualTime: Date? = nil,
+         date: Date,
+         createdAt: Date,
+         updatedAt: Date,
+         voiceEntryUsed: Bool = false,
+         needsSync: Bool = false,
+         isDeletedFlag: Bool = false) {
+        self.id = id
+        self.userId = userId
+        self.mealType = mealType
+        self.foods = foods
+        self.allergies = allergies
+        self.notes = notes
+        self.scheduledTime = scheduledTime
+        self.actualTime = actualTime
+        self.date = date
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+        self.voiceEntryUsed = voiceEntryUsed
+        self.needsSync = needsSync
+        self.isDeletedFlag = isDeletedFlag
+    }
+    
+    // MARK: - Codable
+    enum CodingKeys: String, CodingKey {
+        case id, userId, mealType, foods, allergies, notes
+        case scheduledTime, actualTime, date, createdAt, updatedAt
+        case voiceEntryUsed, needsSync, isDeletedFlag
+    }
 }
 
 // MARK: - Meal Type
@@ -30,13 +68,13 @@ enum MealType: String, Codable, CaseIterable {
     var displayName: String {
         switch self {
         case .breakfast:
-            return "Breakfast"
+            return AppStrings.Diet.breakfast
         case .lunch:
-            return "Lunch"
+            return AppStrings.Diet.lunch
         case .dinner:
-            return "Dinner"
+            return AppStrings.Diet.dinner
         case .snack:
-            return "Snack"
+            return AppStrings.Diet.snack
         }
     }
     
@@ -68,16 +106,34 @@ enum MealType: String, Codable, CaseIterable {
 }
 
 // MARK: - Food Item
-struct FoodItem: Codable, Identifiable {
-    let id: String = UUID().uuidString
+struct FoodItem: Codable, Identifiable, Sendable {
+    let id: String
     var name: String
     var quantity: String?
     var calories: Int?
     var notes: String?
+    
+    // MARK: - Initializer
+    init(id: String = UUID().uuidString,
+         name: String,
+         quantity: String? = nil,
+         calories: Int? = nil,
+         notes: String? = nil) {
+        self.id = id
+        self.name = name
+        self.quantity = quantity
+        self.calories = calories
+        self.notes = notes
+    }
+    
+    // MARK: - Codable
+    enum CodingKeys: String, CodingKey {
+        case id, name, quantity, calories, notes
+    }
 }
 
 // MARK: - Diet Entry Extensions
-extension DietEntry {
+extension DietEntryModel {
     var totalCalories: Int {
         foods.compactMap { $0.calories }.reduce(0, +)
     }
@@ -123,6 +179,10 @@ extension DietEntry {
         }
     }
     
+    var foodItems: String {
+        foods.map { $0.name }.joined(separator: ", ")
+    }
+    
     mutating func addFood(_ food: FoodItem) {
         foods.append(food)
         markForSync()
@@ -152,7 +212,7 @@ extension DietEntry {
 }
 
 // MARK: - Diet Entry Creation Helpers
-extension DietEntry {
+extension DietEntryModel {
     static func create(
         for userId: String,
         mealType: MealType,
@@ -162,8 +222,10 @@ extension DietEntry {
         allergies: [String] = [],
         notes: String? = nil,
         voiceEntryUsed: Bool = false
-    ) -> DietEntry {
-        let entry = DietEntry(
+    ) -> DietEntryModel {
+        let now = Date()
+        let entry = DietEntryModel(
+            id: UUID().uuidString,
             userId: userId,
             mealType: mealType,
             foods: foods,
@@ -172,14 +234,14 @@ extension DietEntry {
             scheduledTime: scheduledTime ?? defaultScheduledTime(for: mealType, on: date),
             actualTime: nil,
             date: date,
-            createdAt: Date(),
-            updatedAt: Date(),
-            voiceEntryUsed: voiceEntryUsed
+            createdAt: now,
+            updatedAt: now,
+            voiceEntryUsed: voiceEntryUsed,
+            needsSync: true,
+            isDeletedFlag: false
         )
         
-        var mutableEntry = entry
-        mutableEntry.markForSync()
-        return mutableEntry
+        return entry
     }
     
     private static func defaultScheduledTime(for mealType: MealType, on date: Date) -> Date? {
@@ -198,6 +260,7 @@ extension FoodItem {
         notes: String? = nil
     ) -> FoodItem {
         return FoodItem(
+            id: UUID().uuidString,
             name: name,
             quantity: quantity,
             calories: calories,
@@ -208,14 +271,15 @@ extension FoodItem {
 
 // MARK: - Sample Data for Development
 #if DEBUG
-extension DietEntry {
-    static let sampleDietEntry = DietEntry(
+extension DietEntryModel {
+    static let sampleDietEntry = DietEntryModel(
+        id: "sample-diet-entry-1",
         userId: "sample-user-id",
         mealType: .breakfast,
         foods: [
-            FoodItem(name: "Oatmeal", quantity: "1 cup", calories: 150, notes: "With blueberries"),
-            FoodItem(name: "Greek Yogurt", quantity: "6 oz", calories: 100, notes: "Plain"),
-            FoodItem(name: "Coffee", quantity: "8 oz", calories: 5, notes: "Black")
+            FoodItem(id: "sample-food-1", name: "Oatmeal", quantity: "1 cup", calories: 150, notes: "With blueberries"),
+            FoodItem(id: "sample-food-2", name: "Greek Yogurt", quantity: "6 oz", calories: 100, notes: "Plain"),
+            FoodItem(id: "sample-food-3", name: "Coffee", quantity: "8 oz", calories: 5, notes: "Black")
         ],
         allergies: [],
         notes: "Healthy breakfast with protein and fiber",
@@ -224,18 +288,21 @@ extension DietEntry {
         date: Date(),
         createdAt: Date(),
         updatedAt: Date(),
-        voiceEntryUsed: false
+        voiceEntryUsed: false,
+        needsSync: false,
+        isDeletedFlag: false
     )
     
-    static let sampleDietEntries: [DietEntry] = [
+    static let sampleDietEntries: [DietEntryModel] = [
         sampleDietEntry,
-        DietEntry(
+        DietEntryModel(
+            id: "sample-diet-entry-2",
             userId: "sample-user-id",
             mealType: .lunch,
             foods: [
-                FoodItem(name: "Grilled Chicken", quantity: "4 oz", calories: 200, notes: "No skin"),
-                FoodItem(name: "Brown Rice", quantity: "1/2 cup", calories: 110, notes: nil),
-                FoodItem(name: "Steamed Broccoli", quantity: "1 cup", calories: 25, notes: nil)
+                FoodItem(id: "sample-food-4", name: "Grilled Chicken", quantity: "4 oz", calories: 200, notes: "No skin"),
+                FoodItem(id: "sample-food-5", name: "Brown Rice", quantity: "1/2 cup", calories: 110, notes: nil),
+                FoodItem(id: "sample-food-6", name: "Steamed Broccoli", quantity: "1 cup", calories: 25, notes: nil)
             ],
             allergies: [],
             notes: "Balanced meal with lean protein",
@@ -244,14 +311,17 @@ extension DietEntry {
             date: Date(),
             createdAt: Date(),
             updatedAt: Date(),
-            voiceEntryUsed: true
+            voiceEntryUsed: true,
+            needsSync: false,
+            isDeletedFlag: false
         ),
-        DietEntry(
+        DietEntryModel(
+            id: "sample-diet-entry-3",
             userId: "sample-user-id",
             mealType: .snack,
             foods: [
-                FoodItem(name: "Apple", quantity: "1 medium", calories: 80, notes: "Honeycrisp"),
-                FoodItem(name: "Almonds", quantity: "10 pieces", calories: 70, notes: "Raw")
+                FoodItem(id: "sample-food-7", name: "Apple", quantity: "1 medium", calories: 80, notes: "Honeycrisp"),
+                FoodItem(id: "sample-food-8", name: "Almonds", quantity: "10 pieces", calories: 70, notes: "Raw")
             ],
             allergies: ["Tree nuts"],
             notes: "Afternoon snack",
@@ -260,7 +330,9 @@ extension DietEntry {
             date: Date(),
             createdAt: Date(),
             updatedAt: Date(),
-            voiceEntryUsed: false
+            voiceEntryUsed: false,
+            needsSync: false,
+            isDeletedFlag: false
         )
     ]
 }

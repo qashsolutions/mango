@@ -15,5 +15,48 @@
 			</array>
 		</dict>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>CLAUDE_API_KEY</key>
+	<string>$(CLAUDE_API_KEY)</string>
+	<key>STRIPE_PUBLISHABLE_KEY</key>
+	<string>$(STRIPE_PUBLISHABLE_KEY)</string>
+	<key>NSSiriUsageDescription</key>
+	<string>MyGuide uses Siri to help you manage medications with voice commands. You can check conflicts, add medications, log doses, and set reminders.</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>com.mangohealth.CheckMedicationConflictsIntent</string>
+		<string>com.mangohealth.AddMedicationIntent</string>
+		<string>com.mangohealth.LogMedicationTakenIntent</string>
+		<string>com.mangohealth.ViewMedicationsIntent</string>
+		<string>com.mangohealth.AskMedicalQuestionIntent</string>
+		<string>com.mangohealth.SetMedicationReminderIntent</string>
+	</array>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>MyGuide uses speech recognition to help you add medications and check conflicts using your voice.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>MyGuide needs microphone access for voice commands to manage your medications.</string>
+	<key>INAlternativeAppNames</key>
+	<array>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>My Guide</string>
+			<key>INAlternativeAppNamePronunciationHint</key>
+			<string>mī gīd</string>
+		</dict>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>MyGuide</string>
+		</dict>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>Guide</string>
+			<key>INAlternativeAppNamePronunciationHint</key>
+			<string>gīd</string>
+		</dict>
+	</array>
 </dict>
 </plist>

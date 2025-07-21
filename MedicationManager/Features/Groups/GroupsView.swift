@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct GroupsView: View {
-    @StateObject private var viewModel = GroupsViewModel()
-    @StateObject private var navigationManager = NavigationManager.shared
+    @State private var viewModel = GroupsViewModel()
+    // Use singleton directly - it manages its own lifecycle with @Observable
+    private let navigationManager = NavigationManager.shared
     @State private var showingSettings: Bool = false
     
     var body: some View {
@@ -119,7 +120,7 @@ struct GroupsView: View {
                         
                         Button(action: { showingSettings = true }) {
                             Image(systemName: AppIcons.settings)
-                                .font(.system(size: 18, weight: .medium))
+                                .font(AppTheme.Typography.callout)
                         }
                     }
                 }
@@ -288,9 +289,9 @@ struct CaregiverCard: View {
                 Text(caregiver.initials)
                     .font(AppTheme.Typography.subheadline)
                     .foregroundColor(AppTheme.Colors.onPrimary)
-                    .frame(width: 48, height: 48)
+                    .frame(width: AppTheme.Sizing.iconLarge, height: AppTheme.Sizing.iconLarge)
                     .background(AppTheme.Colors.primary)
-                    .cornerRadius(24)
+                    .cornerRadius(AppTheme.CornerRadius.extraLarge)
                 
                 // Caregiver Info
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.extraSmall) {
@@ -311,7 +312,7 @@ struct CaregiverCard: View {
                         
                         if caregiver.notificationsEnabled {
                             Image(systemName: AppIcons.notifications)
-                                .font(.system(size: 10))
+                                .font(AppTheme.Typography.caption)
                                 .foregroundColor(AppTheme.Colors.success)
                         }
                     }
@@ -323,7 +324,7 @@ struct CaregiverCard: View {
                 VStack(spacing: AppTheme.Spacing.extraSmall) {
                     Circle()
                         .fill(caregiver.isActive ? AppTheme.Colors.success : AppTheme.Colors.inactive)
-                        .frame(width: 8, height: 8)
+                        .frame(width: AppTheme.Sizing.iconSmall, height: AppTheme.Sizing.iconSmall)
                     
                     Text(AppStrings.Caregivers.grantedDate(caregiver.grantedAt))
                         .font(AppTheme.Typography.caption2)
@@ -400,11 +401,11 @@ struct InvitationCard: View {
         HStack(spacing: AppTheme.Spacing.medium) {
             // Invitation Icon
             Image(systemName: AppIcons.invitation)
-                .font(.system(size: 20))
+                .font(AppTheme.Typography.headline)
                 .foregroundColor(AppTheme.Colors.warning)
-                .frame(width: 40, height: 40)
+                .frame(width: AppTheme.Sizing.iconMedium, height: AppTheme.Sizing.iconMedium)
                 .background(AppTheme.Colors.warningBackground)
-                .cornerRadius(20)
+                .cornerRadius(AppTheme.CornerRadius.extraLarge)
             
             // Invitation Info
             VStack(alignment: .leading, spacing: AppTheme.Spacing.extraSmall) {
@@ -476,11 +477,11 @@ struct AddCaregiverSection: View {
             Button(action: onAddCaregiver) {
                 HStack(spacing: AppTheme.Spacing.medium) {
                     Image(systemName: AppIcons.plus)
-                        .font(.system(size: 20))
+                        .font(AppTheme.Typography.headline)
                         .foregroundColor(AppTheme.Colors.primary)
-                        .frame(width: 40, height: 40)
+                        .frame(width: AppTheme.Sizing.iconMedium, height: AppTheme.Sizing.iconMedium)
                         .background(AppTheme.Colors.primaryBackground)
-                        .cornerRadius(20)
+                        .cornerRadius(AppTheme.CornerRadius.extraLarge)
                     
                     VStack(alignment: .leading, spacing: AppTheme.Spacing.extraSmall) {
                         Text(AppStrings.Caregivers.inviteNewCaregiver)
@@ -496,7 +497,7 @@ struct AddCaregiverSection: View {
                     Spacer()
                     
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 12))
+                        .font(AppTheme.Typography.caption)
                         .foregroundColor(AppTheme.Colors.tertiaryText)
                 }
                 .padding(AppTheme.Spacing.medium)
@@ -504,7 +505,7 @@ struct AddCaregiverSection: View {
                 .cornerRadius(AppTheme.CornerRadius.medium)
                 .overlay(
                     RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium)
-                        .stroke(AppTheme.Colors.primary.opacity(0.3), lineWidth: 1.5)
+                        .stroke(AppTheme.Colors.primary.opacity(AppTheme.Opacity.low), lineWidth: 1.5)
                         .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [5]))
                 )
             }
@@ -556,9 +557,9 @@ struct InfoCard: View {
     var body: some View {
         HStack(alignment: .top, spacing: AppTheme.Spacing.medium) {
             Image(systemName: icon)
-                .font(.system(size: 16))
+                .font(AppTheme.Typography.body)
                 .foregroundColor(AppTheme.Colors.primary)
-                .frame(width: 24, height: 24)
+                .frame(width: AppTheme.Sizing.iconSmall, height: AppTheme.Sizing.iconSmall)
             
             VStack(alignment: .leading, spacing: AppTheme.Spacing.extraSmall) {
                 Text(title)
@@ -642,11 +643,11 @@ struct SettingsRow: View {
         Button(action: action) {
             HStack(spacing: AppTheme.Spacing.medium) {
                 Image(systemName: icon)
-                    .font(.system(size: 16))
+                    .font(AppTheme.Typography.body)
                     .foregroundColor(AppTheme.Colors.primary)
-                    .frame(width: 32, height: 32)
+                    .frame(width: AppTheme.Sizing.iconMedium, height: AppTheme.Sizing.iconMedium)
                     .background(AppTheme.Colors.primaryBackground)
-                    .cornerRadius(8)
+                    .cornerRadius(AppTheme.CornerRadius.medium)
                 
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.extraSmall) {
                     Text(title)
@@ -662,7 +663,7 @@ struct SettingsRow: View {
                 Spacer()
                 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12))
+                    .font(AppTheme.Typography.caption)
                     .foregroundColor(AppTheme.Colors.tertiaryText)
             }
             .padding(AppTheme.Spacing.medium)
@@ -678,9 +679,9 @@ struct GroupSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
-                Text("Group Settings")
+                Text(AppStrings.UI.groupSettings)
                     .font(AppTheme.Typography.title2)
                     .padding()
                 
@@ -728,7 +729,7 @@ struct GroupsSectionHeader: View {
             if let onAdd = onAdd {
                 Button(action: onAdd) {
                     Image(systemName: AppIcons.plus)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(AppTheme.Typography.body)
                         .foregroundColor(AppTheme.Colors.primary)
                 }
             }

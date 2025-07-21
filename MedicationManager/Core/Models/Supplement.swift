@@ -1,8 +1,8 @@
 import Foundation
 import FirebaseFirestore
 
-struct Supplement: Codable, Identifiable, SyncableModel, VoiceInputCapable, UserOwnedModel {
-    let id: String = UUID().uuidString
+struct SupplementModel: Codable, Identifiable, Sendable, SyncableModel, VoiceInputCapable, UserOwnedModel {
+    let id: String
     let userId: String
     var name: String
     var dosage: String
@@ -11,14 +11,63 @@ struct Supplement: Codable, Identifiable, SyncableModel, VoiceInputCapable, User
     var notes: String?
     var purpose: String?
     var brand: String?
-    var isActive: Bool = true
+    var isActive: Bool
+    var isTakenWithFood: Bool
+    var startDate: Date
+    var endDate: Date?
     let createdAt: Date
     var updatedAt: Date
-    var voiceEntryUsed: Bool = false
+    var voiceEntryUsed: Bool
     
     // Sync properties
-    var needsSync: Bool = false
-    var isDeleted: Bool = false
+    var needsSync: Bool
+    var isDeletedFlag: Bool
+    
+    // MARK: - Initializer
+    init(id: String = UUID().uuidString,
+         userId: String,
+         name: String,
+         dosage: String,
+         frequency: SupplementFrequency,
+         schedule: [SupplementSchedule],
+         notes: String? = nil,
+         purpose: String? = nil,
+         brand: String? = nil,
+         isActive: Bool = true,
+         isTakenWithFood: Bool = false,
+         startDate: Date,
+         endDate: Date? = nil,
+         createdAt: Date,
+         updatedAt: Date,
+         voiceEntryUsed: Bool = false,
+         needsSync: Bool = false,
+         isDeletedFlag: Bool = false) {
+        self.id = id
+        self.userId = userId
+        self.name = name
+        self.dosage = dosage
+        self.frequency = frequency
+        self.schedule = schedule
+        self.notes = notes
+        self.purpose = purpose
+        self.brand = brand
+        self.isActive = isActive
+        self.isTakenWithFood = isTakenWithFood
+        self.startDate = startDate
+        self.endDate = endDate
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+        self.voiceEntryUsed = voiceEntryUsed
+        self.needsSync = needsSync
+        self.isDeletedFlag = isDeletedFlag
+    }
+    
+    // MARK: - Codable
+    enum CodingKeys: String, CodingKey {
+        case id, userId, name, dosage, frequency, schedule, notes, purpose, brand
+        case isActive, isTakenWithFood, startDate, endDate, createdAt, updatedAt
+        case voiceEntryUsed, needsSync, isDeletedFlag
+    }
 }
 
 // MARK: - Supplement Frequency
@@ -43,17 +92,22 @@ enum SupplementFrequency: String, Codable, CaseIterable {
 }
 
 // MARK: - Supplement Schedule
-struct SupplementSchedule: Codable, Identifiable {
+struct SupplementSchedule: Codable, Identifiable, Sendable {
     let id: String = UUID().uuidString
     var time: Date
     var amount: String
     var withMeal: Bool = false
     var isCompleted: Bool = false
     var completedAt: Date?
+    
+    // MARK: - Codable
+    enum CodingKeys: String, CodingKey {
+        case time, amount, withMeal, isCompleted, completedAt
+    }
 }
 
 // MARK: - Supplement Extensions
-extension Supplement {
+extension SupplementModel {
     var isDueToday: Bool {
         let calendar = Calendar.current
         let today = Date()
@@ -95,7 +149,7 @@ extension Supplement {
 }
 
 // MARK: - Supplement Creation Helpers
-extension Supplement {
+extension SupplementModel {
     static func create(
         for userId: String,
         name: String,
@@ -105,8 +159,10 @@ extension Supplement {
         brand: String? = nil,
         notes: String? = nil,
         voiceEntryUsed: Bool = false
-    ) -> Supplement {
-        var supplement = Supplement(
+    ) -> SupplementModel {
+        let now = Date()
+        var supplement = SupplementModel(
+            id: UUID().uuidString,
             userId: userId,
             name: name,
             dosage: dosage,
@@ -115,14 +171,17 @@ extension Supplement {
             notes: notes,
             purpose: purpose,
             brand: brand,
-            createdAt: Date(),
-            updatedAt: Date(),
-            voiceEntryUsed: voiceEntryUsed
+            isActive: true,
+            startDate: now,
+            createdAt: now,
+            updatedAt: now,
+            voiceEntryUsed: voiceEntryUsed,
+            needsSync: true,
+            isDeletedFlag: false
         )
         
         // Generate default schedule based on frequency
         supplement.schedule = generateDefaultSchedule(for: frequency)
-        supplement.markForSync()
         
         return supplement
     }
@@ -152,8 +211,9 @@ extension Supplement {
 
 // MARK: - Sample Data for Development
 #if DEBUG
-extension Supplement {
-    static let sampleSupplement = Supplement(
+extension SupplementModel {
+    static let sampleSupplement = SupplementModel(
+        id: "sample-supplement-1",
         userId: "sample-user-id",
         name: "Vitamin D3",
         dosage: "2000 IU",
@@ -168,14 +228,19 @@ extension Supplement {
         notes: "Take with breakfast for better absorption",
         purpose: "Bone health and immune support",
         brand: "Nature Made",
+        isActive: true,
+        startDate: Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date(),
         createdAt: Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date(),
         updatedAt: Date(),
-        voiceEntryUsed: false
+        voiceEntryUsed: false,
+        needsSync: false,
+        isDeletedFlag: false
     )
     
-    static let sampleSupplements: [Supplement] = [
+    static let sampleSupplements: [SupplementModel] = [
         sampleSupplement,
-        Supplement(
+        SupplementModel(
+            id: "sample-supplement-2",
             userId: "sample-user-id",
             name: "Omega-3",
             dosage: "1000mg",
@@ -190,11 +255,16 @@ extension Supplement {
             notes: "EPA/DHA for heart health",
             purpose: "Heart and brain health",
             brand: "Nordic Naturals",
+            isActive: true,
+            startDate: Calendar.current.date(byAdding: .month, value: -3, to: Date()) ?? Date(),
             createdAt: Calendar.current.date(byAdding: .month, value: -3, to: Date()) ?? Date(),
             updatedAt: Date(),
-            voiceEntryUsed: true
+            voiceEntryUsed: true,
+            needsSync: false,
+            isDeletedFlag: false
         ),
-        Supplement(
+        SupplementModel(
+            id: "sample-supplement-3",
             userId: "sample-user-id",
             name: "Vitamin B12",
             dosage: "1000mcg",
@@ -209,9 +279,13 @@ extension Supplement {
             notes: "Sublingual tablet",
             purpose: "Energy and nervous system support",
             brand: "Solgar",
+            isActive: true,
+            startDate: Calendar.current.date(byAdding: .month, value: -2, to: Date()) ?? Date(),
             createdAt: Calendar.current.date(byAdding: .month, value: -2, to: Date()) ?? Date(),
             updatedAt: Date(),
-            voiceEntryUsed: false
+            voiceEntryUsed: false,
+            needsSync: false,
+            isDeletedFlag: false
         )
     ]
 }

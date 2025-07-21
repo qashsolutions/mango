@@ -229,7 +229,7 @@ struct CompactEmptyState: View {
     var body: some View {
         HStack(spacing: AppTheme.Spacing.medium) {
             Image(systemName: icon)
-                .font(.system(size: 20, weight: .light))
+                .font(AppTheme.Typography.headline)
                 .foregroundColor(AppTheme.Colors.onBackground)
             
             Text(message)

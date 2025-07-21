@@ -2,8 +2,8 @@ import Foundation
 import FirebaseFirestore
 import Contacts
 
-struct Doctor: Codable, Identifiable, SyncableModel, UserOwnedModel {
-    let id: String = UUID().uuidString
+struct DoctorModel: Codable, Identifiable, Sendable, SyncableModel, VoiceInputCapable, UserOwnedModel {
+    let id: String
     let userId: String
     var name: String
     var specialty: String
@@ -11,14 +11,55 @@ struct Doctor: Codable, Identifiable, SyncableModel, UserOwnedModel {
     var email: String?
     var address: DoctorAddress?
     var notes: String?
-    var isImportedFromContacts: Bool = false
+    var isImportedFromContacts: Bool
     var contactIdentifier: String?
     let createdAt: Date
     var updatedAt: Date
+    var voiceEntryUsed: Bool
     
     // Sync properties
-    var needsSync: Bool = false
-    var isDeleted: Bool = false
+    var needsSync: Bool
+    var isDeletedFlag: Bool
+    
+    // MARK: - Initializer
+    init(id: String = UUID().uuidString,
+         userId: String,
+         name: String,
+         specialty: String,
+         phoneNumber: String? = nil,
+         email: String? = nil,
+         address: DoctorAddress? = nil,
+         notes: String? = nil,
+         isImportedFromContacts: Bool = false,
+         contactIdentifier: String? = nil,
+         createdAt: Date,
+         updatedAt: Date,
+         voiceEntryUsed: Bool = false,
+         needsSync: Bool = false,
+         isDeletedFlag: Bool = false) {
+        self.id = id
+        self.userId = userId
+        self.name = name
+        self.specialty = specialty
+        self.phoneNumber = phoneNumber
+        self.email = email
+        self.address = address
+        self.notes = notes
+        self.isImportedFromContacts = isImportedFromContacts
+        self.contactIdentifier = contactIdentifier
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+        self.voiceEntryUsed = voiceEntryUsed
+        self.needsSync = needsSync
+        self.isDeletedFlag = isDeletedFlag
+    }
+    
+    // MARK: - Codable
+    enum CodingKeys: String, CodingKey {
+        case id, userId, name, specialty, phoneNumber, email, address, notes
+        case isImportedFromContacts, contactIdentifier, createdAt, updatedAt
+        case voiceEntryUsed, needsSync, isDeletedFlag
+    }
 }
 
 // MARK: - Doctor Address
@@ -27,62 +68,85 @@ struct DoctorAddress: Codable {
     var city: String?
     var state: String?
     var zipCode: String?
-    var country: String = "US"
+    var country: String = Configuration.App.defaultCountry
     
     var fullAddress: String {
-        let components = [street, city, state, zipCode, country].compactMap { $0 }
-        return components.joined(separator: ", ")
+        let components = [street, city, state, zipCode, country].compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+        return components.joined(separator: AppStrings.Common.addressSeparator)
     }
     
     var isEmpty: Bool {
-        return street?.isEmpty != false && 
-               city?.isEmpty != false && 
-               state?.isEmpty != false && 
-               zipCode?.isEmpty != false
+        return street?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false &&
+               city?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false &&
+               state?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false &&
+               zipCode?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty != false
     }
 }
 
 // MARK: - Doctor Extensions
-extension Doctor {
+extension DoctorModel {
     var displayName: String {
-        if name.hasPrefix("Dr.") || name.hasPrefix("Dr ") {
-            return name
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedName.hasPrefix(AppStrings.Doctors.drPrefix) || trimmedName.hasPrefix(AppStrings.Doctors.drPrefixShort) {
+            return trimmedName
         } else {
-            return "Dr. \(name)"
+            return "\(AppStrings.Doctors.drPrefix) \(trimmedName)"
         }
     }
     
     var initials: String {
-        let nameComponents = name.components(separatedBy: " ")
+        let nameComponents = name.components(separatedBy: .whitespacesAndNewlines)
+            .filter { !$0.isEmpty }
         let initials = nameComponents.compactMap { $0.first }.prefix(2)
         return String(initials).uppercased()
     }
     
     var hasContactInfo: Bool {
-        return phoneNumber?.isEmpty == false || email?.isEmpty == false
+        return phoneNumber?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ||
+               email?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
     }
     
     var formattedPhoneNumber: String? {
-        guard let phoneNumber = phoneNumber else { return nil }
+        guard let phoneNumber = phoneNumber?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !phoneNumber.isEmpty else { return nil }
         
         // Simple US phone number formatting
         let digits = phoneNumber.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
         
-        if digits.count == 10 {
+        if digits.count == Configuration.App.phoneNumberLength {
             let area = String(digits.prefix(3))
             let exchange = String(digits.dropFirst(3).prefix(3))
             let number = String(digits.suffix(4))
-            return "(\(area)) \(exchange)-\(number)"
+            return AppStrings.Doctors.phoneFormat
+                .replacingOccurrences(of: "{area}", with: area)
+                .replacingOccurrences(of: "{exchange}", with: exchange)
+                .replacingOccurrences(of: "{number}", with: number)
         }
         
         return phoneNumber
     }
     
+    var isValidEmail: Bool {
+        guard let email = email?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !email.isEmpty else { return true }
+        
+        let emailRegex = Configuration.App.emailRegex
+        return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
+    }
+    
+    var isValidPhone: Bool {
+        guard let phone = phoneNumber?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !phone.isEmpty else { return true }
+        
+        let digits = phone.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        return digits.count == Configuration.App.phoneNumberLength
+    }
+    
     mutating func updateContactInfo(phone: String?, email: String?) {
-        if let phone = phone, !phone.isEmpty {
+        if let phone = phone?.trimmingCharacters(in: .whitespacesAndNewlines), !phone.isEmpty {
             self.phoneNumber = phone
         }
-        if let email = email, !email.isEmpty {
+        if let email = email?.trimmingCharacters(in: .whitespacesAndNewlines), !email.isEmpty {
             self.email = email
         }
         markForSync()
@@ -94,17 +158,25 @@ extension Doctor {
     }
     
     mutating func addNote(_ note: String) {
-        if let existingNotes = notes, !existingNotes.isEmpty {
-            notes = "\(existingNotes)\n\(note)"
+        let trimmedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedNote.isEmpty else { return }
+        
+        if let existingNotes = notes?.trimmingCharacters(in: .whitespacesAndNewlines), !existingNotes.isEmpty {
+            notes = "\(existingNotes)\n\(trimmedNote)"
         } else {
-            notes = note
+            notes = trimmedNote
         }
+        markForSync()
+    }
+    
+    mutating func clearNotes() {
+        notes = nil
         markForSync()
     }
 }
 
 // MARK: - Doctor Creation Helpers
-extension Doctor {
+extension DoctorModel{
     static func create(
         for userId: String,
         name: String,
@@ -112,21 +184,28 @@ extension Doctor {
         phoneNumber: String? = nil,
         email: String? = nil,
         address: DoctorAddress? = nil,
-        notes: String? = nil
-    ) -> Doctor {
-        var doctor = Doctor(
+        notes: String? = nil,
+        voiceEntryUsed: Bool = false
+    ) -> DoctorModel {
+        let now = Date()
+        let doctor = DoctorModel(
+            id: UUID().uuidString,
             userId: userId,
-            name: name,
-            specialty: specialty,
-            phoneNumber: phoneNumber,
-            email: email,
+            name: name.trimmingCharacters(in: .whitespacesAndNewlines),
+            specialty: specialty.trimmingCharacters(in: .whitespacesAndNewlines),
+            phoneNumber: phoneNumber?.trimmingCharacters(in: .whitespacesAndNewlines),
+            email: email?.trimmingCharacters(in: .whitespacesAndNewlines),
             address: address,
-            notes: notes,
-            createdAt: Date(),
-            updatedAt: Date()
+            notes: notes?.trimmingCharacters(in: .whitespacesAndNewlines),
+            isImportedFromContacts: false,
+            contactIdentifier: nil,
+            createdAt: now,
+            updatedAt: now,
+            voiceEntryUsed: voiceEntryUsed,
+            needsSync: true,
+            isDeletedFlag: false
         )
         
-        doctor.markForSync()
         return doctor
     }
     
@@ -134,42 +213,58 @@ extension Doctor {
         for userId: String,
         contact: CNContact,
         specialty: String
-    ) -> Doctor {
+    ) -> DoctorModel {
         let phoneNumber = contact.phoneNumbers.first?.value.stringValue
         let email = contact.emailAddresses.first?.value as String?
         
         var address: DoctorAddress?
         if let cnAddress = contact.postalAddresses.first?.value {
             address = DoctorAddress(
-                street: cnAddress.street,
-                city: cnAddress.city,
-                state: cnAddress.state,
-                zipCode: cnAddress.postalCode,
-                country: cnAddress.country
+                street: cnAddress.street.trimmingCharacters(in: .whitespacesAndNewlines),
+                city: cnAddress.city.trimmingCharacters(in: .whitespacesAndNewlines),
+                state: cnAddress.state.trimmingCharacters(in: .whitespacesAndNewlines),
+                zipCode: cnAddress.postalCode.trimmingCharacters(in: .whitespacesAndNewlines),
+                country: cnAddress.country.isEmpty ? Configuration.App.defaultCountry : cnAddress.country
             )
         }
         
-        var doctor = Doctor(
+        let fullName = "\(contact.givenName) \(contact.familyName)".trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        let now = Date()
+        let doctor = DoctorModel(
+            id: UUID().uuidString,
             userId: userId,
-            name: "\(contact.givenName) \(contact.familyName)",
-            specialty: specialty,
+            name: fullName,
+            specialty: specialty.trimmingCharacters(in: .whitespacesAndNewlines),
             phoneNumber: phoneNumber,
             email: email,
             address: address,
             notes: nil,
             isImportedFromContacts: true,
             contactIdentifier: contact.identifier,
-            createdAt: Date(),
-            updatedAt: Date()
+            createdAt: now,
+            updatedAt: now,
+            voiceEntryUsed: false,
+            needsSync: true,
+            isDeletedFlag: false
         )
         
-        doctor.markForSync()
         return doctor
     }
 }
 
+// MARK: - Validation
+extension DoctorModel {
+    var isValid: Bool {
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+        !userId.isEmpty &&
+        isValidEmail &&
+        isValidPhone
+    }
+}
+
 // MARK: - Common Specialties
-extension Doctor {
+extension DoctorModel {
     enum CommonSpecialty: String, CaseIterable {
         case primaryCare = "Primary Care"
         case cardiology = "Cardiology"
@@ -193,70 +288,133 @@ extension Doctor {
         case pathology = "Pathology"
         case other = "Other"
         
+        var localizedName: String {
+            switch self {
+            case .primaryCare:
+                return AppStrings.Doctors.specialtyPrimaryCare
+            case .cardiology:
+                return AppStrings.Doctors.specialtyCardiology
+            case .endocrinology:
+                return AppStrings.Doctors.specialtyEndocrinology
+            case .neurology:
+                return AppStrings.Doctors.specialtyNeurology
+            case .psychiatry:
+                return AppStrings.Doctors.specialtyPsychiatry
+            case .dermatology:
+                return AppStrings.Doctors.specialtyDermatology
+            case .orthopedics:
+                return AppStrings.Doctors.specialtyOrthopedics
+            case .ophthalmology:
+                return AppStrings.Doctors.specialtyOphthalmology
+            case .gastroenterology:
+                return AppStrings.Doctors.specialtyGastroenterology
+            case .pulmonology:
+                return AppStrings.Doctors.specialtyPulmonology
+            case .nephrology:
+                return AppStrings.Doctors.specialtyNephrology
+            case .rheumatology:
+                return AppStrings.Doctors.specialtyRheumatology
+            case .oncology:
+                return AppStrings.Doctors.specialtyOncology
+            case .urology:
+                return AppStrings.Doctors.specialtyUrology
+            case .gynecology:
+                return AppStrings.Doctors.specialtyGynecology
+            case .pediatrics:
+                return AppStrings.Doctors.specialtyPediatrics
+            case .emergency:
+                return AppStrings.Doctors.specialtyEmergency
+            case .anesthesiology:
+                return AppStrings.Doctors.specialtyAnesthesiology
+            case .radiology:
+                return AppStrings.Doctors.specialtyRadiology
+            case .pathology:
+                return AppStrings.Doctors.specialtyPathology
+            case .other:
+                return AppStrings.Doctors.specialtyOther
+            }
+        }
+        
         static var sortedCases: [CommonSpecialty] {
-            return [.primaryCare] + allCases.filter { $0 != .primaryCare && $0 != .other }.sorted { $0.rawValue < $1.rawValue } + [.other]
+            return [.primaryCare] + allCases.filter { $0 != .primaryCare && $0 != .other }.sorted { $0.localizedName < $1.localizedName } + [.other]
         }
     }
 }
 
 // MARK: - Sample Data for Development
 #if DEBUG
-extension Doctor {
-    static let sampleDoctor = Doctor(
-        userId: "sample-user-id",
-        name: "Dr. Sarah Johnson",
-        specialty: "Primary Care",
-        phoneNumber: "(555) 123-4567",
-        email: "dr.johnson@medicalpractice.com",
+extension DoctorModel {
+    static let sampleDoctor = DoctorModel(
+        id: "sample-doctor-1",
+        userId: Configuration.Debug.sampleUserId,
+        name: AppStrings.Doctors.sampleName1,
+        specialty: AppStrings.Doctors.specialtyPrimaryCare,
+        phoneNumber: AppStrings.Doctors.samplePhone1,
+        email: AppStrings.Doctors.sampleEmail1,
         address: DoctorAddress(
-            street: "123 Medical Center Dr",
-            city: "San Francisco",
-            state: "CA",
-            zipCode: "94103",
-            country: "US"
+            street: AppStrings.Doctors.sampleStreet1,
+            city: AppStrings.Doctors.sampleCity1,
+            state: AppStrings.Doctors.sampleState1,
+            zipCode: AppStrings.Doctors.sampleZip1,
+            country: Configuration.App.defaultCountry
         ),
-        notes: "Excellent bedside manner. Accepts most insurance plans.",
+        notes: AppStrings.Doctors.sampleNotes1,
+        isImportedFromContacts: false,
+        contactIdentifier: nil,
         createdAt: Calendar.current.date(byAdding: .month, value: -6, to: Date()) ?? Date(),
-        updatedAt: Date()
+        updatedAt: Date(),
+        voiceEntryUsed: false,
+        needsSync: false,
+        isDeletedFlag: false
     )
     
-    static let sampleDoctors: [Doctor] = [
+    static let sampleDoctors: [DoctorModel] = [
         sampleDoctor,
-        Doctor(
-            userId: "sample-user-id",
-            name: "Dr. Michael Chen",
-            specialty: "Cardiology",
-            phoneNumber: "(555) 987-6543",
-            email: "m.chen@heartcenter.com",
+        DoctorModel(
+            id: "sample-doctor-2",
+            userId: Configuration.Debug.sampleUserId,
+            name: AppStrings.Doctors.sampleName2,
+            specialty: AppStrings.Doctors.specialtyCardiology,
+            phoneNumber: AppStrings.Doctors.samplePhone2,
+            email: AppStrings.Doctors.sampleEmail2,
             address: DoctorAddress(
-                street: "456 Heart Health Blvd",
-                city: "San Francisco",
-                state: "CA",
-                zipCode: "94110",
-                country: "US"
+                street: AppStrings.Doctors.sampleStreet2,
+                city: AppStrings.Doctors.sampleCity2,
+                state: AppStrings.Doctors.sampleState2,
+                zipCode: AppStrings.Doctors.sampleZip2,
+                country: Configuration.App.defaultCountry
             ),
-            notes: "Specializes in preventive cardiology. Recommended for annual checkups.",
+            notes: AppStrings.Doctors.sampleNotes2,
+            isImportedFromContacts: false,
+            contactIdentifier: nil,
             createdAt: Calendar.current.date(byAdding: .month, value: -3, to: Date()) ?? Date(),
-            updatedAt: Date()
+            updatedAt: Date(),
+            voiceEntryUsed: false,
+            needsSync: false,
+            isDeletedFlag: false
         ),
-        Doctor(
-            userId: "sample-user-id",
-            name: "Dr. Emily Rodriguez",
-            specialty: "Endocrinology",
-            phoneNumber: "(555) 456-7890",
-            email: "e.rodriguez@diabetescenter.org",
+        DoctorModel(
+            id: "sample-doctor-3",
+            userId: Configuration.Debug.sampleUserId,
+            name: AppStrings.Doctors.sampleName3,
+            specialty: AppStrings.Doctors.specialtyEndocrinology,
+            phoneNumber: AppStrings.Doctors.samplePhone3,
+            email: AppStrings.Doctors.sampleEmail3,
             address: DoctorAddress(
-                street: "789 Diabetes Care Way",
-                city: "Oakland",
-                state: "CA",
-                zipCode: "94601",
-                country: "US"
+                street: AppStrings.Doctors.sampleStreet3,
+                city: AppStrings.Doctors.sampleCity3,
+                state: AppStrings.Doctors.sampleState3,
+                zipCode: AppStrings.Doctors.sampleZip3,
+                country: Configuration.App.defaultCountry
             ),
-            notes: "Diabetes specialist. Very knowledgeable about latest treatments.",
+            notes: AppStrings.Doctors.sampleNotes3,
             isImportedFromContacts: true,
-            contactIdentifier: "ABC123",
+            contactIdentifier: AppStrings.Doctors.sampleContactId,
             createdAt: Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date(),
-            updatedAt: Date()
+            updatedAt: Date(),
+            voiceEntryUsed: false,
+            needsSync: false,
+            isDeletedFlag: false
         )
     ]
 }

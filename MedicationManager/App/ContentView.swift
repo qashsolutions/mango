@@ -1,14 +1,16 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var authManager = FirebaseManager.shared
+    // iOS 18/Swift 6: Direct reference to @Observable singleton (no property wrapper needed)
+    private let authManager = FirebaseManager.shared
+    private let viewFactory = AppViewFactory()
     
     var body: some View {
         Group {
             if authManager.isAuthenticated {
-                MainTabView()
+                MainTabView(viewFactory: viewFactory)
             } else {
-                AuthenticationLandingView()
+                AuthenticationView()
             }
         }
     }
@@ -16,13 +18,14 @@ struct ContentView: View {
 
 // MARK: - Authentication Landing View
 struct AuthenticationLandingView: View {
-    @StateObject private var navigationManager = NavigationManager.shared
+    // Use singleton directly - it manages its own lifecycle with @Observable
+    @Bindable private var navigationManager = NavigationManager.shared
     
     var body: some View {
         NavigationStack {
             VStack(spacing: AppTheme.Spacing.large) {
                 Image(systemName: AppIcons.health)
-                    .font(.system(size: 60))
+                    .font(AppTheme.Typography.largeTitle)
                     .foregroundColor(AppTheme.Colors.primary)
                 
                 Text(AppStrings.Authentication.welcomeMessage)
@@ -54,10 +57,10 @@ struct AuthenticationLandingView: View {
                 }
             }
             .padding(AppTheme.Spacing.large)
-            .navigationTitle("Mango Health")
+            .navigationTitle("MyGuide")
         }
         .fullScreenCover(item: $navigationManager.presentedFullScreenCover) { destination in
-            FullScreenCoverView(destination: destination)
+            FullScreenCoverView(destination: destination, viewFactory: AppViewFactory())
         }
     }
 }

@@ -1,15 +1,17 @@
 import Foundation
 import SwiftUI
+import Observation
 
 @MainActor
-class NavigationManager: ObservableObject {
+@Observable
+class NavigationManager: NavigationManagerProtocol {
     static let shared = NavigationManager()
     
-    @Published var selectedTab: MainTab = .myHealth
-    @Published var navigationPath = NavigationPath()
-    @Published var presentedSheet: SheetDestination?
-    @Published var presentedFullScreenCover: FullScreenDestination?
-    @Published var showingAlert: AlertItem?
+    var selectedTab: MainTab = .myHealth
+    var navigationPath = NavigationPath()
+    var presentedSheet: SheetDestination?
+    var presentedFullScreenCover: FullScreenDestination?
+    var showingAlert: AlertItem?
     
     private init() {}
     
@@ -242,7 +244,7 @@ enum SheetDestination: Identifiable {
     case editDoctor(id: String)
     case caregiverInvitation(code: String)
     case inviteCaregiver
-    case voiceInput(context: VoiceInputContext)
+    case voiceInput(context: VoiceInteractionContext)
     case medicationConflictCheck
     case userProfileEdit
     
@@ -448,7 +450,7 @@ struct AlertButton {
 // MARK: - Voice Input Result
 struct VoiceInputResult {
     let text: String
-    let context: VoiceInputContext
+    let context: VoiceInteractionContext
     let confidence: Float
 }
 

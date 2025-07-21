@@ -1,14 +1,15 @@
 import SwiftUI
 
 struct SyncStatusView: View {
-    @StateObject private var dataSync = DataSyncManager.shared
+    // iOS 18/Swift 6: Direct reference to @Observable singleton
+    private let dataSync = DataSyncManager.shared
     @State private var showingDetails: Bool = false
     
     var body: some View {
         Button(action: { showingDetails.toggle() }) {
             HStack(spacing: AppTheme.Spacing.small) {
                 Image(systemName: dataSync.getSyncStatus().icon)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(AppTheme.Typography.caption)
                     .foregroundColor(syncStatusColor)
                     .rotationEffect(.degrees(dataSync.isSyncing ? 360 : 0))
                     .animation(
@@ -20,7 +21,7 @@ struct SyncStatusView: View {
                 
                 Text(dataSync.getSyncStatus().displayText)
                     .font(AppTheme.Typography.caption2)
-                    .foregroundColor(AppTheme.Colors.onSurface.opacity(0.7))
+                    .foregroundColor(AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high))
             }
             .padding(.horizontal, AppTheme.Spacing.small)
             .padding(.vertical, AppTheme.Spacing.extraSmall)
@@ -51,17 +52,18 @@ struct SyncStatusView: View {
         case "syncError":
             return AppTheme.Colors.error
         default:
-            return AppTheme.Colors.onSurface.opacity(0.7)
+            return AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high)
         }
     }
 }
 
 struct SyncDetailsView: View {
-    @StateObject private var dataSync = DataSyncManager.shared
+    // iOS 18/Swift 6: Direct reference to @Observable singleton
+    private let dataSync = DataSyncManager.shared
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(alignment: .leading, spacing: AppTheme.Spacing.medium) {
                 // Current Status
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.small) {
@@ -71,7 +73,7 @@ struct SyncDetailsView: View {
                     
                     HStack(spacing: AppTheme.Spacing.small) {
                         Image(systemName: dataSync.getSyncStatus().icon)
-                            .font(.system(size: 16))
+                            .font(AppTheme.Typography.body)
                             .foregroundColor(syncStatusColor)
                         
                         Text(dataSync.getSyncStatus().displayText)
@@ -93,7 +95,7 @@ struct SyncDetailsView: View {
                         
                         Text(lastSync.formatted(.relative(presentation: .named)))
                             .font(AppTheme.Typography.body)
-                            .foregroundColor(AppTheme.Colors.onSurface.opacity(0.7))
+                            .foregroundColor(AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high))
                     }
                     
                     Divider()
@@ -107,7 +109,7 @@ struct SyncDetailsView: View {
                     
                     HStack(spacing: AppTheme.Spacing.small) {
                         Image(systemName: dataSync.isOnline ? "wifi" : "wifi.slash")
-                            .font(.system(size: 16))
+                            .font(AppTheme.Typography.body)
                             .foregroundColor(dataSync.isOnline ? AppTheme.Colors.success : AppTheme.Colors.error)
                         
                         Text(dataSync.isOnline ? AppStrings.Sync.online : AppStrings.Sync.offline)
@@ -124,7 +126,12 @@ struct SyncDetailsView: View {
                 VStack(spacing: AppTheme.Spacing.medium) {
                     Button(action: {
                         Task {
-                            await dataSync.forceSyncAll()
+                            do {
+                                try await dataSync.forceSyncAll()
+                            } catch {
+                                // Error is already set in dataSync.syncError
+                                // UI will update automatically via @Observable
+                            }
                         }
                     }) {
                         Text(AppStrings.Sync.forceSyncNow)
@@ -154,7 +161,7 @@ struct SyncDetailsView: View {
                             }) {
                                 HStack(spacing: AppTheme.Spacing.extraSmall) {
                                     Image(systemName: "arrow.clockwise")
-                                        .font(.system(size: 14, weight: .medium))
+                                        .font(AppTheme.Typography.footnote)
                                     Text(AppStrings.Common.retry)
                                         .font(AppTheme.Typography.headline)
                                 }
@@ -202,7 +209,7 @@ struct SyncDetailsView: View {
         case "syncError":
             return AppTheme.Colors.error
         default:
-            return AppTheme.Colors.onSurface.opacity(0.7)
+            return AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high)
         }
     }
 }

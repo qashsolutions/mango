@@ -1,15 +1,17 @@
 import Foundation
 
 // MARK: - App Error Definitions
-enum AppError: LocalizedError {
+enum AppError: LocalizedError, Sendable {
     case authentication(AuthError)
     case network(NetworkError)
     case data(DataError)
     case voice(VoiceError)
+    case voiceInteraction(VoiceInteractionError)
     case sync(SyncError)
     case caregiver(CaregiverError)
     case caregiverAccessError(CaregiverAccessError)
     case subscription(SubscriptionError)
+    case claudeAPI(ClaudeAPIError)
     
     var errorDescription: String? {
         switch self {
@@ -21,6 +23,8 @@ enum AppError: LocalizedError {
             return dataError.localizedDescription
         case .voice(let voiceError):
             return voiceError.localizedDescription
+        case .voiceInteraction(let voiceInteractionError):
+            return voiceInteractionError.localizedDescription
         case .sync(let syncError):
             return syncError.localizedDescription
         case .caregiver(let caregiverError):
@@ -29,12 +33,14 @@ enum AppError: LocalizedError {
             return caregiverAccessError.localizedDescription
         case .subscription(let subscriptionError):
             return subscriptionError.localizedDescription
+        case .claudeAPI(let claudeAPIError):
+            return claudeAPIError.localizedDescription
         }
     }
 }
 
 // MARK: - Authentication Errors
-enum AuthError: LocalizedError {
+enum AuthError: LocalizedError, Sendable {
     case signInFailed
     case signOutFailed
     case userNotFound
@@ -47,6 +53,7 @@ enum AuthError: LocalizedError {
     case mfaRequired
     case sessionExpired
     case notAuthenticated
+    case tooManyAttempts
     
     var errorDescription: String? {
         switch self {
@@ -74,12 +81,14 @@ enum AuthError: LocalizedError {
             return AppStrings.ErrorMessages.authenticationError
         case .notAuthenticated:
             return AppStrings.ErrorMessages.authenticationError
+        case .tooManyAttempts:
+            return AppStrings.ErrorMessages.authenticationError
         }
     }
 }
 
 // MARK: - Network Errors
-enum NetworkError: LocalizedError {
+enum NetworkError: LocalizedError, Sendable {
     case noConnection
     case timeout
     case serverError
@@ -110,7 +119,7 @@ enum NetworkError: LocalizedError {
 }
 
 // MARK: - Data Errors
-enum DataError: LocalizedError {
+enum DataError: LocalizedError, Sendable {
     case saveFailed
     case loadFailed
     case corruptedData
@@ -121,6 +130,14 @@ enum DataError: LocalizedError {
     case validationFailed
     case noData
     case unknown
+    case conflictAnalysisFailed
+    case cacheExpired
+    case analysisTimeout
+    case migrationFailed
+    case invalidDate
+    case dataRecovered
+    case inMemoryOnly
+    case storeNotAvailable
     
     var errorDescription: String? {
         switch self {
@@ -142,18 +159,35 @@ enum DataError: LocalizedError {
             return AppStrings.ErrorMessages.dataError
         case .unknown:
             return AppStrings.ErrorMessages.genericError
+        case .conflictAnalysisFailed:
+            return AppStrings.ErrorMessages.conflictAnalysisError
+        case .cacheExpired:
+            return AppStrings.ErrorMessages.dataError
+        case .analysisTimeout:
+            return AppStrings.ErrorMessages.analysisTimeoutError
+        case .migrationFailed:
+            return AppStrings.ErrorMessages.dataError
+        case .invalidDate:
+            return AppStrings.ErrorMessages.dataError
+        case .dataRecovered:
+            return "Data has been recovered. Some information may be missing."
+        case .inMemoryOnly:
+            return "Working offline. Changes will be lost when app closes."
+        case .storeNotAvailable:
+            return "Local storage is unavailable. Please try again."
         }
     }
 }
 
 // MARK: - Voice Input Errors
-enum VoiceError: LocalizedError {
+enum VoiceError: LocalizedError, Sendable {
     case microphonePermissionDenied
     case speechRecognitionFailed
     case noSpeechDetected
     case speechRecognitionUnavailable
     case audioSessionError
     case transcriptionTimeout
+    case invalidState
     
     var errorDescription: String? {
         switch self {
@@ -169,12 +203,38 @@ enum VoiceError: LocalizedError {
             return AppStrings.ErrorMessages.genericError
         case .transcriptionTimeout:
             return AppStrings.ErrorMessages.genericError
+        case .invalidState:
+            return AppStrings.ErrorMessages.genericError
+        }
+    }
+}
+
+// MARK: - Voice Interaction Errors (for VoiceInteractionManager)
+enum VoiceInteractionError: LocalizedError, Sendable {
+    case permissionDenied
+    case recordingFailed
+    case transcriptionFailed
+    case noSpeechDetected
+    case microphoneUnavailable
+    
+    var errorDescription: String? {
+        switch self {
+        case .permissionDenied:
+            return AppStrings.Voice.permissionMessage
+        case .recordingFailed:
+            return AppStrings.ErrorMessages.genericError
+        case .transcriptionFailed:
+            return AppStrings.ErrorMessages.genericError
+        case .noSpeechDetected:
+            return AppStrings.Voice.noSpeechDetected
+        case .microphoneUnavailable:
+            return AppStrings.ErrorMessages.genericError
         }
     }
 }
 
 // MARK: - Sync Errors
-enum SyncError: LocalizedError {
+enum SyncError: LocalizedError, Sendable {
     case firebaseConnectionFailed
     case coreDataError
     case syncTimeout
@@ -183,6 +243,7 @@ enum SyncError: LocalizedError {
     case offlineModeRequired
     case uploadFailed
     case downloadFailed
+    case syncInProgress
     
     var errorDescription: String? {
         switch self {
@@ -202,12 +263,14 @@ enum SyncError: LocalizedError {
             return AppStrings.ErrorMessages.networkError
         case .downloadFailed:
             return AppStrings.ErrorMessages.networkError
+        case .syncInProgress:
+            return "Sync is already in progress. Please wait."
         }
     }
 }
 
 // MARK: - Caregiver Errors
-enum CaregiverError: LocalizedError {
+enum CaregiverError: LocalizedError, Sendable {
     case accessDenied
     case invitationFailed
     case maxCaregiversReached
@@ -243,7 +306,7 @@ enum CaregiverError: LocalizedError {
 }
 
 // MARK: - Caregiver Access Error
-enum CaregiverAccessError: LocalizedError {
+enum CaregiverAccessError: LocalizedError, Sendable {
     case loadFailed, saveFailed, alreadyInvited, maxCaregiversReached
     case invitationFailed, invitationExpired, acceptFailed, declineFailed
     case revokeFailed, invalidInvitationCode
@@ -271,7 +334,7 @@ enum CaregiverAccessError: LocalizedError {
 }
 
 // MARK: - Subscription Errors
-enum SubscriptionError: LocalizedError {
+enum SubscriptionError: LocalizedError, Sendable {
     case subscriptionExpired
     case paymentFailed
     case productNotFound
@@ -293,6 +356,79 @@ enum SubscriptionError: LocalizedError {
             return AppStrings.ErrorMessages.genericError
         case .refundProcessingError:
             return AppStrings.ErrorMessages.genericError
+        }
+    }
+}
+
+// MARK: - Claude API Errors
+enum ClaudeAPIError: LocalizedError, Sendable {
+    case unauthorized
+    case rateLimited
+    case invalidResponse
+    case networkTimeout
+    case modelUnavailable
+    case tokenLimitExceeded
+    case apiKeyMissing
+    case invalidRequest
+    case serverError
+    case parsingError
+    
+    var errorDescription: String? {
+        switch self {
+        case .unauthorized:
+            return AppStrings.ErrorMessages.claudeAPIUnauthorized
+        case .rateLimited:
+            return AppStrings.ErrorMessages.claudeAPIRateLimited
+        case .invalidResponse:
+            return AppStrings.ErrorMessages.claudeAPIInvalidResponse
+        case .networkTimeout:
+            return AppStrings.ErrorMessages.networkError
+        case .modelUnavailable:
+            return AppStrings.ErrorMessages.claudeAPIModelUnavailable
+        case .tokenLimitExceeded:
+            return AppStrings.ErrorMessages.claudeAPITokenLimit
+        case .apiKeyMissing:
+            return AppStrings.ErrorMessages.claudeAPIKeyMissing
+        case .invalidRequest:
+            return AppStrings.ErrorMessages.claudeAPIInvalidRequest
+        case .serverError:
+            return AppStrings.ErrorMessages.serverError
+        case .parsingError:
+            return AppStrings.ErrorMessages.claudeAPIParsingError
+        }
+    }
+}
+
+// MARK: - App Error Extension
+extension AppError {
+    // MARK: - Convenience Static Properties
+    static var userNotAuthenticated: AppError {
+        return .authentication(.notAuthenticated)
+    }
+    
+    // MARK: - Retryable Errors
+    var isRetryable: Bool {
+        switch self {
+        case .network:
+            return true
+        case .sync:
+            return true
+        case .data(let dataError):
+            switch dataError {
+            case .loadFailed, .cacheExpired, .analysisTimeout:
+                return true
+            default:
+                return false
+            }
+        case .claudeAPI(let apiError):
+            switch apiError {
+            case .rateLimited, .networkTimeout, .serverError:
+                return true
+            default:
+                return false
+            }
+        default:
+            return false
         }
     }
 }

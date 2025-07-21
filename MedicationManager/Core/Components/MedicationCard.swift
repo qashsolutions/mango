@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MedicationCard: View {
-    let medication: Medication
+    let medication: MedicationModel
     let onTap: () -> Void
     let onTakeAction: (() -> Void)?
     let onEditAction: (() -> Void)?
@@ -10,7 +10,7 @@ struct MedicationCard: View {
     @State private var showingMenu: Bool = false
     
     init(
-        medication: Medication,
+        medication: MedicationModel,
         onTap: @escaping () -> Void,
         onTakeAction: (() -> Void)? = nil,
         onEditAction: (() -> Void)? = nil
@@ -34,7 +34,7 @@ struct MedicationCard: View {
                         
                         Text("\(medication.dosage) • \(medication.frequency.displayName)")
                             .font(AppTheme.Typography.subheadline)
-                            .foregroundColor(AppTheme.Colors.onSurface.opacity(0.7))
+                            .foregroundColor(AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high))
                             .lineLimit(1)
                     }
                     
@@ -43,29 +43,29 @@ struct MedicationCard: View {
                     HStack(spacing: AppTheme.Spacing.small) {
                         if medication.voiceEntryUsed {
                             Image(systemName: AppIcons.voice)
-                                .font(.system(size: 12))
+                                .font(AppTheme.Typography.caption)
                                 .foregroundColor(AppTheme.Colors.info)
                         }
                         
-                        StatusIndicator(medication: medication)
+                        statusIndicator(medication: medication)
                         
-                        MenuButton()
+                        menuButton()
                     }
                 }
                 
                 // Schedule Information
                 if !medication.schedule.isEmpty {
-                    ScheduleRow(schedule: medication.schedule)
+                    scheduleRow(schedule: medication.schedule)
                 }
                 
                 // Quick Actions
                 if medication.isActive {
-                    ActionButtons()
+                    actionButtons()
                 }
                 
                 // Additional Info
                 if let notes = medication.notes, !notes.isEmpty {
-                    NotesSection(notes: notes)
+                    notesSection(notes: notes)
                 }
             }
             .padding(AppTheme.Spacing.medium)
@@ -84,7 +84,7 @@ struct MedicationCard: View {
         }
         .buttonStyle(PlainButtonStyle())
         .contextMenu {
-            ContextMenuContent()
+            contextMenuContent()
         }
         .alert(AppStrings.Medications.confirmTake, isPresented: $showingTakeConfirmation) {
             Button(AppStrings.Common.confirm) {
@@ -99,10 +99,10 @@ struct MedicationCard: View {
     
     // MARK: - Subviews
     @ViewBuilder
-    private func StatusIndicator(medication: Medication) -> some View {
+    private func statusIndicator(medication: MedicationModel) -> some View {
         Circle()
             .fill(statusColor)
-            .frame(width: 8, height: 8)
+            .frame(width: AppTheme.Sizing.iconSmall, height: AppTheme.Sizing.iconSmall)
             .overlay(
                 Circle()
                     .stroke(statusBorderColor, lineWidth: 1)
@@ -110,26 +110,26 @@ struct MedicationCard: View {
     }
     
     @ViewBuilder
-    private func MenuButton() -> some View {
+    private func menuButton() -> some View {
         Button(action: { showingMenu.toggle() }) {
             Image(systemName: "ellipsis")
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(AppTheme.Colors.onSurface.opacity(0.7))
-                .frame(width: 20, height: 20)
+                .font(AppTheme.Typography.footnote)
+                .foregroundColor(AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high))
+                .frame(width: AppTheme.Sizing.iconSmall, height: AppTheme.Sizing.iconSmall)
         }
         .buttonStyle(PlainButtonStyle())
     }
     
     @ViewBuilder
-    private func ScheduleRow(schedule: [MedicationSchedule]) -> some View {
+    private func scheduleRow(schedule: [MedicationSchedule]) -> some View {
         HStack(spacing: AppTheme.Spacing.small) {
             Image(systemName: AppIcons.schedule)
-                .font(.system(size: 12))
-                .foregroundColor(AppTheme.Colors.onSurface.opacity(0.7))
+                .font(AppTheme.Typography.caption)
+                .foregroundColor(AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high))
             
             Text(scheduleText)
                 .font(AppTheme.Typography.caption1)
-                .foregroundColor(AppTheme.Colors.onSurface.opacity(0.7))
+                .foregroundColor(AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high))
                 .lineLimit(1)
             
             Spacer()
@@ -137,7 +137,7 @@ struct MedicationCard: View {
     }
     
     @ViewBuilder
-    private func ActionButtons() -> some View {
+    private func actionButtons() -> some View {
         HStack(spacing: AppTheme.Spacing.medium) {
             if let onTakeAction = onTakeAction {
                 Button(action: {
@@ -148,7 +148,7 @@ struct MedicationCard: View {
                 }) {
                     HStack(spacing: AppTheme.Spacing.extraSmall) {
                         Image(systemName: AppIcons.success)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(AppTheme.Typography.caption)
                         Text(AppStrings.Medications.markTaken)
                             .font(AppTheme.Typography.caption1)
                     }
@@ -157,7 +157,7 @@ struct MedicationCard: View {
                     .padding(.vertical, AppTheme.Spacing.extraSmall)
                     .background(
                         RoundedRectangle(cornerRadius: AppTheme.CornerRadius.small)
-                            .fill(AppTheme.Colors.success.opacity(0.1))
+                            .fill(AppTheme.Colors.success.opacity(AppTheme.Opacity.low))
                     )
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -165,36 +165,36 @@ struct MedicationCard: View {
             
             Spacer()
             
-            NextDoseInfo()
+            nextDoseInfo()
         }
     }
     
     @ViewBuilder
-    private func NextDoseInfo() -> some View {
+    private func nextDoseInfo() -> some View {
         if let nextDose = getNextDoseTime() {
             HStack(spacing: AppTheme.Spacing.extraSmall) {
                 Image(systemName: AppIcons.schedule)
-                    .font(.system(size: 10))
-                    .foregroundColor(AppTheme.Colors.onSurface.opacity(0.7))
+                    .font(AppTheme.Typography.caption)
+                    .foregroundColor(AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high))
                 
                 Text(AppStrings.Medications.nextDose(formattedNextDoseTime(nextDose)))
                     .font(AppTheme.Typography.caption2)
-                    .foregroundColor(AppTheme.Colors.onSurface.opacity(0.7))
+                    .foregroundColor(AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high))
             }
         }
     }
     
     @ViewBuilder
-    private func NotesSection(notes: String) -> some View {
+    private func notesSection(notes: String) -> some View {
         HStack(alignment: .top, spacing: AppTheme.Spacing.extraSmall) {
             Image(systemName: AppIcons.info)
-                .font(.system(size: 10))
-                .foregroundColor(AppTheme.Colors.onSurface.opacity(0.7))
+                .font(AppTheme.Typography.caption)
+                .foregroundColor(AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high))
                 .padding(.top, 2)
             
             Text(notes)
                 .font(AppTheme.Typography.caption1)
-                .foregroundColor(AppTheme.Colors.onSurface.opacity(0.7))
+                .foregroundColor(AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high))
                 .lineLimit(2)
             
             Spacer()
@@ -202,7 +202,7 @@ struct MedicationCard: View {
     }
     
     @ViewBuilder
-    private func ContextMenuContent() -> some View {
+    private func contextMenuContent() -> some View {
         if let onTakeAction = onTakeAction {
             Button(action: onTakeAction) {
                 Label(AppStrings.Medications.markTaken, systemImage: AppIcons.success)
@@ -226,7 +226,7 @@ struct MedicationCard: View {
     private var statusColor: Color {
         if !medication.isActive {
             // Inactive medications show gray status
-            return AppTheme.Colors.onSurface.opacity(0.3)
+            return AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.low)
         } else if hasUpcomingDose {
             // Upcoming dose within 1 hour shows warning color
             return AppTheme.Colors.warning
@@ -237,16 +237,16 @@ struct MedicationCard: View {
     }
     
     private var statusBorderColor: Color {
-        statusColor.opacity(0.3)
+        statusColor.opacity(AppTheme.Opacity.low)
     }
     
     private var borderColor: Color {
         if !medication.isActive {
             // Inactive medications have more prominent border
-            return AppTheme.Colors.onSurface.opacity(0.2)
+            return AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.low)
         } else {
             // Active medications have subtle border
-            return AppTheme.Colors.onSurface.opacity(0.1)
+            return AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.low)
         }
     }
     
@@ -265,10 +265,10 @@ struct MedicationCard: View {
             return AppStrings.Medications.noActiveTimes
         }
         
-        if activeTimes.count == 1 {
+        if activeTimes.count == 1, let firstTime = activeTimes.first {
             let formatter = DateFormatter()
             formatter.timeStyle = .short
-            return AppStrings.Medications.nextAt(formatter.string(from: activeTimes.first!.time))
+            return AppStrings.Medications.nextAt(formatter.string(from: firstTime.time))
         } else {
             return AppStrings.Medications.multipleTimesPerDay(activeTimes.count)
         }
@@ -322,7 +322,7 @@ struct MedicationCard: View {
 
 // MARK: - Compact Medication Card
 struct CompactMedicationCard: View {
-    let medication: Medication
+    let medication: MedicationModel
     let onTap: () -> Void
     
     var body: some View {
@@ -336,7 +336,7 @@ struct CompactMedicationCard: View {
                     
                     Text(medication.dosage)
                         .font(AppTheme.Typography.caption1)
-                        .foregroundColor(AppTheme.Colors.onSurface.opacity(0.7))
+                        .foregroundColor(AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.high))
                         .lineLimit(1)
                 }
                 
@@ -345,17 +345,17 @@ struct CompactMedicationCard: View {
                 HStack(spacing: AppTheme.Spacing.small) {
                     if medication.voiceEntryUsed {
                         Image(systemName: AppIcons.voice)
-                            .font(.system(size: 10))
+                            .font(AppTheme.Typography.caption)
                             .foregroundColor(AppTheme.Colors.info)
                     }
                     
                     Circle()
-                        .fill(medication.isActive ? AppTheme.Colors.success : AppTheme.Colors.onSurface.opacity(0.3))
-                        .frame(width: 6, height: 6)
+                        .fill(medication.isActive ? AppTheme.Colors.success : AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.low))
+                        .frame(width: AppTheme.Sizing.iconSmall, height: AppTheme.Sizing.iconSmall)
                     
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(AppTheme.Colors.onSurface.opacity(0.5))
+                        .font(AppTheme.Typography.caption)
+                        .foregroundColor(AppTheme.Colors.onSurface.opacity(AppTheme.Opacity.medium))
                 }
             }
             .padding(.horizontal, AppTheme.Spacing.medium)
@@ -369,7 +369,7 @@ struct CompactMedicationCard: View {
 
 // MARK: - Medication List Card
 struct MedicationListCard: View {
-    let medications: [Medication]
+    let medications: [MedicationModel]
     let title: String
     let onViewAll: () -> Void
     
@@ -430,19 +430,19 @@ struct MedicationListCard: View {
     ScrollView {
         VStack(spacing: AppTheme.Spacing.large) {
             MedicationCard(
-                medication: Medication.sampleMedication,
+                medication: MedicationModel.sampleMedication,
                 onTap: {},
                 onTakeAction: {},
                 onEditAction: {}
             )
             
             CompactMedicationCard(
-                medication: Medication.sampleMedication,
+                medication: MedicationModel.sampleMedication,
                 onTap: {}
             )
             
             MedicationListCard(
-                medications: Medication.sampleMedications,
+                medications: MedicationModel.sampleMedications,
                 title: "Today's Medications",
                 onViewAll: {}
             )

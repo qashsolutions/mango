@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Framework Bundle Information -->
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	
+	<key>CFBundleIdentifier</key>
+	<string>com.medicationmanager.kit</string>
+	
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	
+	<!-- Framework Type -->
+	<key>CFBundlePackageType</key>
+	<string>FMWK</string>
+	
+	<!-- Minimum OS Version -->
+	<key>MinimumOSVersion</key>
+	<string>17.0</string>
+	
+	<!-- Framework Description -->
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2025 MedicationManager. All rights reserved.</string>
+	
+	<!-- Principal Class (if needed) -->
+	<key>NSPrincipalClass</key>
+	<string></string>
+	
+	<!-- Framework Features -->
+	<key>MedicationManagerKitFeatures</key>
+	<dict>
+		<key>SharedCoreData</key>
+		<true/>
+		<key>ExtensionKeychain</key>
+		<true/>
+		<key>SendableModels</key>
+		<true/>
+		<key>ClaudeAPISupport</key>
+		<true/>
+		<key>AnalyticsSupport</key>
+		<true/>
+	</dict>
+	
+	<!-- Supported Platforms -->
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+		<string>iPadOS</string>
+	</array>
+	
+	<!-- Required Device Capabilities -->
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+</dict>
+</plist>

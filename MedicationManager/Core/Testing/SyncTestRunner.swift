@@ -1,11 +1,13 @@
 import Foundation
+import Observation
 
 #if DEBUG
 @MainActor
-class SyncTestRunner: ObservableObject {
-    @Published var testResults: [TestResult] = []
-    @Published var isRunning: Bool = false
-    @Published var currentTest: String = ""
+@Observable
+final class SyncTestRunner {
+    var testResults: [TestResult] = []
+    var isRunning: Bool = false
+    var currentTest: String = ""
     
     private let coreDataManager = CoreDataManager.shared
     private let dataSyncManager = DataSyncManager.shared
@@ -54,22 +56,22 @@ class SyncTestRunner: ObservableObject {
             
             // Save medication
             try await coreDataManager.saveMedication(testMedication)
-            addTestResult(testName, "Save", true, "Medication saved successfully")
+            addTestResult(testName, "Save", true, AppStrings.Success.itemSaved("Medication"))
             
             // Fetch medications
             let fetchedMedications = try await coreDataManager.fetchMedications(for: testMedication.userId)
             let medicationExists = fetchedMedications.contains { $0.id == testMedication.id }
-            addTestResult(testName, "Fetch", medicationExists, medicationExists ? "Medication fetched successfully" : "Medication not found")
+            addTestResult(testName, "Fetch", medicationExists, medicationExists ? AppStrings.Testing.medicationFetchedSuccessfully : AppStrings.Testing.medicationNotFound)
             
             // Update medication
             var updatedMedication = testMedication
             updatedMedication.notes = "Updated test notes"
             try await coreDataManager.saveMedication(updatedMedication)
-            addTestResult(testName, "Update", true, "Medication updated successfully")
+            addTestResult(testName, "Update", true, AppStrings.Testing.medicationUpdatedSuccessfully)
             
             // Delete medication
-            try await coreDataManager.deleteMedication(withId: testMedication.id)
-            addTestResult(testName, "Delete", true, "Medication deleted successfully")
+            try await coreDataManager.deleteMedication(testMedication.id)
+            addTestResult(testName, "Delete", true, AppStrings.Success.itemDeleted("Medication"))
             
         } catch {
             addTestResult(testName, "Operations", false, "Error: \(error.localizedDescription)")
@@ -86,12 +88,12 @@ class SyncTestRunner: ObservableObject {
             
             // Save supplement
             try await coreDataManager.saveSupplement(testSupplement)
-            addTestResult(testName, "Save", true, "Supplement saved successfully")
+            addTestResult(testName, "Save", true, AppStrings.Success.itemSaved("Supplement"))
             
             // Fetch supplements
             let fetchedSupplements = try await coreDataManager.fetchSupplements(for: testSupplement.userId)
             let supplementExists = fetchedSupplements.contains { $0.id == testSupplement.id }
-            addTestResult(testName, "Fetch", supplementExists, supplementExists ? "Supplement fetched successfully" : "Supplement not found")
+            addTestResult(testName, "Fetch", supplementExists, supplementExists ? AppStrings.Testing.supplementFetchedSuccessfully : AppStrings.Testing.supplementNotFound)
             
         } catch {
             addTestResult(testName, "Operations", false, "Error: \(error.localizedDescription)")
@@ -130,11 +132,13 @@ class SyncTestRunner: ObservableObject {
         let testName = "Database Size Monitoring"
         currentTest = testName
         
-        let initialSize = coreDataManager.getDatabaseSize()
-        let sizeRetrieved = initialSize != "Unknown"
+        // TODO: getDatabaseSize method needs to be implemented in CoreDataManager
+        // For now, we'll skip this test
+        let sizeRetrieved = false
+        let _ = "Not implemented"
         
         addTestResult(testName, "Size Retrieval", sizeRetrieved,
-                     sizeRetrieved ? "Database size: \(initialSize)" : "Could not retrieve database size")
+                     "Database size monitoring not yet implemented")
     }
     
     // MARK: - Online Tests
@@ -209,7 +213,7 @@ class SyncTestRunner: ObservableObject {
         
         addTestResult(testName, "Status Detection", true, "Sync status: \(syncStatus.displayText)")
         addTestResult(testName, "Last Sync", lastSyncDate != nil,
-                     lastSyncDate != nil ? "Last sync: \(lastSyncDate!.formatted())" : "No previous sync")
+                     lastSyncDate.map { "Last sync: \($0.formatted())" } ?? "No previous sync")
     }
     
     private func testOfflineToOnlineSync() async {
@@ -230,7 +234,7 @@ class SyncTestRunner: ObservableObject {
             try await coreDataManager.saveMedication(medication)
             
             // Trigger sync
-            await dataSyncManager.syncPendingChanges()
+            try await dataSyncManager.syncPendingChanges()
             
             // Check if sync completed without error
             let syncError = dataSyncManager.syncError
@@ -267,7 +271,7 @@ class SyncTestRunner: ObservableObject {
         currentTest = testName
         
         // Test sync retry mechanism
-        if let syncError = dataSyncManager.syncError {
+        if dataSyncManager.syncError != nil {
             await dataSyncManager.retryFailedSync()
             let errorCleared = dataSyncManager.syncError == nil
             addTestResult(testName, "Error Recovery", errorCleared,
@@ -278,8 +282,9 @@ class SyncTestRunner: ObservableObject {
     }
     
     // MARK: - Test Helpers
-    private func createTestMedication() -> Medication {
-        return Medication(
+    private func createTestMedication() -> MedicationModel {
+        return MedicationModel(
+            id: UUID().uuidString,
             userId: authManager.currentUser?.id ?? "test-user",
             name: "Test Medication",
             dosage: "10mg",
@@ -292,12 +297,15 @@ class SyncTestRunner: ObservableObject {
             isActive: true,
             createdAt: Date(),
             updatedAt: Date(),
-            voiceEntryUsed: false
+            voiceEntryUsed: false,
+            takeWithFood: false,
+            needsSync: true,
+            isDeletedFlag: false
         )
     }
     
-    private func createTestSupplement() -> Supplement {
-        return Supplement(
+    private func createTestSupplement() -> SupplementModel {
+        return SupplementModel(
             userId: authManager.currentUser?.id ?? "test-user",
             name: "Test Supplement",
             dosage: "500mg",
@@ -307,6 +315,7 @@ class SyncTestRunner: ObservableObject {
             purpose: "Testing",
             brand: "Test Brand",
             isActive: true,
+            startDate: Date(),
             createdAt: Date(),
             updatedAt: Date(),
             voiceEntryUsed: false

@@ -1,10 +1,12 @@
 import Foundation
+import Observation
 
 @MainActor
-class GroupsViewModel: ObservableObject {
-    @Published var accessControl: AccessControl = AccessControl.shared
-    @Published var isLoading: Bool = false
-    @Published var error: AppError?
+@Observable
+final class GroupsViewModel {
+    var accessControl: AccessControl = AccessControl.shared
+    var isLoading: Bool = false
+    var error: AppError?
     
     private let authManager = FirebaseManager.shared
     private let analyticsManager = AnalyticsManager.shared

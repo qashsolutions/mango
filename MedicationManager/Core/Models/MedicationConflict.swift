@@ -1,7 +1,8 @@
 import Foundation
 import FirebaseFirestore
+import SwiftUI
 
-struct MedicationConflict: Codable, Identifiable, SyncableModel, UserOwnedModel {
+struct MedicationConflict: Codable, Identifiable, Sendable, SyncableModel, UserOwnedModel {
     let id: String = UUID().uuidString
     let userId: String
     let queryText: String
@@ -13,6 +14,7 @@ struct MedicationConflict: Codable, Identifiable, SyncableModel, UserOwnedModel 
     let recommendations: [String]
     let educationalInfo: String?
     let source: ConflictSource
+    let confidence: Double?
     let createdAt: Date
     var updatedAt: Date
     var isResolved: Bool = false
@@ -20,11 +22,20 @@ struct MedicationConflict: Codable, Identifiable, SyncableModel, UserOwnedModel 
     
     // Sync properties
     var needsSync: Bool = false
-    var isDeleted: Bool = false
+    var isDeletedFlag: Bool = false
+    
+    // MARK: - Codable
+    enum CodingKeys: String, CodingKey {
+        case userId, queryText, medications, supplements, conflictsFound
+        case severity, conflictDetails, recommendations, educationalInfo
+        case source, confidence, createdAt, updatedAt, isResolved, userNotes
+        case needsSync, isDeletedFlag
+    }
 }
 
 // MARK: - Conflict Severity
 enum ConflictSeverity: String, Codable, CaseIterable {
+    case none = "none"
     case low = "low"
     case medium = "medium"
     case high = "high"
@@ -32,45 +43,53 @@ enum ConflictSeverity: String, Codable, CaseIterable {
     
     var displayName: String {
         switch self {
+        case .none:
+            return "None"
         case .low:
-            return "Low Risk"
+            return AppStrings.Conflicts.Severity.low
         case .medium:
-            return "Moderate Risk"
+            return AppStrings.Conflicts.Severity.medium
         case .high:
-            return "High Risk"
+            return AppStrings.Conflicts.Severity.high
         case .critical:
-            return "Critical Risk"
+            return AppStrings.Conflicts.Severity.critical
         }
     }
     
-    var color: String {
+    var color: Color {
         switch self {
+        case .none:
+            return AppTheme.Colors.success
         case .low:
-            return "conflictLow"
+            return AppTheme.Colors.conflictLow
         case .medium:
-            return "conflictMedium"
+            return AppTheme.Colors.conflictMedium
         case .high:
-            return "conflictHigh"
+            return AppTheme.Colors.conflictHigh
         case .critical:
-            return "conflictCritical"
+            return AppTheme.Colors.conflictCritical
         }
     }
     
     var icon: String {
         switch self {
+        case .none:
+            return AppIcons.success
         case .low:
-            return "info.circle.fill"
+            return AppIcons.conflictLow
         case .medium:
-            return "exclamationmark.triangle.fill"
+            return AppIcons.conflictMedium
         case .high:
-            return "exclamationmark.triangle.fill"
+            return AppIcons.conflictHigh
         case .critical:
-            return "exclamationmark.octagon.fill"
+            return AppIcons.conflictCritical
         }
     }
     
     var priority: Int {
         switch self {
+        case .none:
+            return 0
         case .low:
             return 1
         case .medium:
@@ -84,74 +103,114 @@ enum ConflictSeverity: String, Codable, CaseIterable {
     
     var description: String {
         switch self {
+        case .none:
+            return AppStrings.Conflicts.Severity.noneDescription
         case .low:
-            return "Minor interaction that may not require action"
+            return AppStrings.Conflicts.Severity.lowDescription
         case .medium:
-            return "Moderate interaction that should be monitored"
+            return AppStrings.Conflicts.Severity.mediumDescription
         case .high:
-            return "Significant interaction that may require dosage adjustment"
+            return AppStrings.Conflicts.Severity.highDescription
         case .critical:
-            return "Dangerous interaction that requires immediate attention"
+            return AppStrings.Conflicts.Severity.criticalDescription
+        }
+    }
+    
+    var level: Int {
+        return priority
+    }
+    
+    var backgroundColor: Color {
+        return color.opacity(AppTheme.Opacity.low)
+    }
+    
+    var foregroundColor: Color {
+        return color
+    }
+    
+    var borderColor: Color {
+        return color.opacity(AppTheme.Opacity.medium)
+    }
+    
+    // MARK: - Conversion from ClaudeAIClient.ConflictSeverity
+    init(from clientSeverity: ClaudeAIClient.ConflictSeverity) {
+        switch clientSeverity {
+        case .none:
+            self = .none
+        case .low:
+            self = .low
+        case .medium:
+            self = .medium
+        case .high:
+            self = .high
+        case .critical:
+            self = .critical
         }
     }
 }
 
 // MARK: - Conflict Detail
 struct ConflictDetail: Codable, Identifiable {
-    let id: String = UUID().uuidString
-    let medication1: String
-    let medication2: String?
-    let interactionType: String
-    let description: String
-    let severity: ConflictSeverity
-    let mechanism: String?
-    let clinicalSignificance: String?
-    let management: String?
-    
-    var involvesSupplements: Bool {
-        return medication2?.contains("supplement") == true || 
-               medication1.contains("supplement")
-    }
-    
-    var displayTitle: String {
-        if let medication2 = medication2 {
-            return "\(medication1) + \(medication2)"
-        } else {
-            return medication1
-        }
-    }
+   let id: String = UUID().uuidString
+   let medication1: String
+   let medication2: String?
+   let interactionType: String
+   let description: String
+   let severity: ConflictSeverity
+   let mechanism: String?
+   let clinicalSignificance: String?
+   let management: String?
+   
+   var involvesSupplements: Bool {
+       // TODO: Implement proper supplement detection in next release
+       return false
+   }
+   
+   var displayTitle: String {
+       if let medication2 = medication2 {
+           return "\(medication1) + \(medication2)"
+       } else {
+           return medication1
+       }
+   }
+   
+   // MARK: - Codable
+   enum CodingKeys: String, CodingKey {
+       case medication1, medication2, interactionType, description
+       case severity, mechanism, clinicalSignificance, management
+   }
 }
 
 // MARK: - Conflict Source
 enum ConflictSource: String, Codable {
-    case medgemma = "medgemma_ai"
+    case claudeAI = "claude_ai"
     case manual = "manual_entry"
     case scheduled = "scheduled_check"
     case realtime = "realtime_check"
     
     var displayName: String {
         switch self {
-        case .medgemma:
-            return "AI Analysis"
+        case .claudeAI:
+            return AppStrings.Conflicts.Source.aiAnalysis
         case .manual:
-            return "Manual Check"
+            return AppStrings.Conflicts.Source.manualCheck
         case .scheduled:
-            return "Scheduled Review"
+            return AppStrings.Conflicts.Source.scheduledReview
         case .realtime:
-            return "Real-time Check"
+            return AppStrings.Conflicts.Source.realtimeCheck
         }
     }
     
     var icon: String {
         switch self {
-        case .medgemma:
-            return "brain.head.profile"
+        case .claudeAI:
+            return AppIcons.ai
         case .manual:
-            return "hand.raised.fill"
+            return AppIcons.Conflicts.Source.manual
         case .scheduled:
-            return "clock.fill"
+            return AppIcons.schedule
         case .realtime:
-            return "bolt.fill"
+            return AppIcons.Conflicts.Source.realtime
         }
     }
 }
@@ -177,16 +236,16 @@ extension MedicationConflict {
     
     var displaySummary: String {
         if !conflictsFound {
-            return "No conflicts detected"
+            return AppStrings.Conflicts.Messages.noConflictsDetected
         }
         
         let conflictCount = conflictDetails.count
         let severityText = highestSeverity.displayName
         
         if conflictCount == 1 {
-            return "1 \(severityText.lowercased()) conflict detected"
+            return AppStrings.Conflicts.Messages.oneConflictDetected(severityText.lowercased())
         } else {
-            return "\(conflictCount) conflicts detected (highest: \(severityText.lowercased()))"
+            return AppStrings.Conflicts.Messages.multipleConflictsDetected(conflictCount, severityText.lowercased())
         }
     }
     
@@ -202,7 +261,7 @@ extension MedicationConflict {
     
     mutating func addUserNote(_ note: String) {
         if let existingNotes = userNotes, !existingNotes.isEmpty {
-            userNotes = "\(existingNotes)\n\(note)"
+            userNotes = "\(existingNotes)\(Configuration.Text.newlineCharacter)\(note)"
         } else {
             userNotes = note
         }
@@ -222,7 +281,8 @@ extension MedicationConflict {
         conflictDetails: [ConflictDetail] = [],
         recommendations: [String] = [],
         educationalInfo: String? = nil,
-        source: ConflictSource
+        source: ConflictSource,
+        confidence: Double? = nil
     ) -> MedicationConflict {
         var conflict = MedicationConflict(
             userId: userId,
@@ -235,6 +295,7 @@ extension MedicationConflict {
             recommendations: recommendations,
             educationalInfo: educationalInfo,
             source: source,
+            confidence: confidence,
             createdAt: Date(),
             updatedAt: Date()
         )
@@ -257,6 +318,42 @@ extension MedicationConflict {
             supplements: supplements,
             conflictsFound: false,
             source: source
+        )
+    }
+    
+    /// Creates a MedicationConflict from ClaudeAIClient.ConflictAnalysis
+    /// - Parameters:
+    ///   - analysis: The conflict analysis from Claude AI
+    ///   - userId: The user ID for the conflict record
+    /// - Returns: A MedicationConflict instance
+    static func fromAnalysis(_ analysis: ClaudeAIClient.ConflictAnalysis, userId: String) -> MedicationConflict {
+        // Convert conflict details from ClaudeAIClient.DrugConflict to ConflictDetail
+        let conflictDetails = analysis.conflicts.map { conflict in
+            ConflictDetail.create(
+                medication1: conflict.drug1,
+                medication2: conflict.drug2,
+                interactionType: "Drug-Drug Interaction",
+                description: conflict.description,
+                severity: ConflictSeverity(from: conflict.severity),
+                mechanism: conflict.mechanism,
+                clinicalSignificance: conflict.clinicalSignificance,
+                management: conflict.management
+            )
+        }
+        
+        // Create MedicationConflict using the standard create method
+        return create(
+            for: userId,
+            queryText: "AI Analysis at \(analysis.timestamp.formatted())",
+            medications: analysis.medicationsAnalyzed,
+            supplements: [],
+            conflictsFound: analysis.conflictsFound,
+            severity: ConflictSeverity(from: analysis.severity),
+            conflictDetails: conflictDetails,
+            recommendations: analysis.recommendations,
+            educationalInfo: analysis.summary,
+            source: .claudeAI,
+            confidence: analysis.confidence
         )
     }
 }
@@ -286,7 +383,7 @@ extension ConflictDetail {
 }
 
 // MARK: - Conflict Analysis Summary
-struct ConflictAnalysisSummary {
+struct ConflictAnalysisSummary: Sendable {
     let totalConflicts: Int
     let criticalConflicts: Int
     let highRiskConflicts: Int
@@ -336,7 +433,8 @@ extension MedicationConflict {
             "Consult with your healthcare provider before making changes"
         ],
         educationalInfo: "Warfarin and aspirin both affect blood clotting but through different mechanisms. When taken together, they can significantly increase the risk of bleeding.",
-        source: .medgemma,
+        source: .claudeAI,
+        confidence: 0.95, // High confidence for known interaction
         createdAt: Calendar.current.date(byAdding: .hour, value: -2, to: Date()) ?? Date(),
         updatedAt: Date()
     )
@@ -352,6 +450,7 @@ extension MedicationConflict {
         recommendations: [],
         educationalInfo: "No significant interactions found between Lisinopril and Vitamin D3 supplements.",
         source: .realtime,
+        confidence: 0.90, // High confidence for no interaction
         createdAt: Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date(),
         updatedAt: Date()
     )
@@ -384,6 +483,7 @@ extension MedicationConflict {
             ],
             educationalInfo: "This is a minor interaction with potential benefits for diabetes management.",
             source: .scheduled,
+            confidence: 0.75, // Moderate confidence
             createdAt: Calendar.current.date(byAdding: .day, value: -3, to: Date()) ?? Date(),
             updatedAt: Date()
         )

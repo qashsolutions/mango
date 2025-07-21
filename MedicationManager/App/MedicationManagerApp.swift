@@ -6,7 +6,8 @@ struct MedicationManagerApp: App {
     @State private var firebaseManager = FirebaseManager.shared
     
     init() {
-        // Firebase is configured in FirebaseManager
+        // Configure Firebase before any Firebase services are used
+        FirebaseApp.configure()
     }
     
     var body: some Scene {

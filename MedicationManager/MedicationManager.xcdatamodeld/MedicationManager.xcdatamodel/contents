@@ -1,9 +1,96 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="false" userDefinedModelVersionIdentifier="">
-    <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
-        <attribute name="timestamp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24D70" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="ConflictEntity" representedClassName="ConflictEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="confidence" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="conflictDetails" attributeType="String"/>
+        <attribute name="conflictDetailsData" optional="YES" attributeType="Binary"/>
+        <attribute name="conflictsFound" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="educationalInfo" optional="YES" attributeType="String"/>
+        <attribute name="id" attributeType="String" elementID="Primary identifier"/>
+        <attribute name="isDeletedFlag" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isResolved" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="lastUpdated" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="medicationsData" optional="YES" attributeType="Binary"/>
+        <attribute name="needsSync" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="queryText" optional="YES" attributeType="String"/>
+        <attribute name="recommendation" attributeType="String"/>
+        <attribute name="recommendationsData" optional="YES" attributeType="Binary"/>
+        <attribute name="severity" attributeType="String" defaultValueString="none"/>
+        <attribute name="source" optional="YES" attributeType="String"/>
+        <attribute name="supplementsData" optional="YES" attributeType="Binary"/>
+        <attribute name="userId" attributeType="String" spotlightIndexingEnabled="YES"/>
+        <attribute name="userNotes" optional="YES" attributeType="String"/>
     </entity>
-    <elements>
-        <element name="Item" positionX="-63" positionY="-18" width="128" height="44"/>
-    </elements>
+    <entity name="DietEntryEntity" representedClassName="DietEntryEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="actualTime" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="allergiesData" attributeType="Binary"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="foodsData" attributeType="Binary"/>
+        <attribute name="id" attributeType="String"/>
+        <attribute name="isDeletedFlag" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="mealType" attributeType="String"/>
+        <attribute name="needsSync" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="scheduledTime" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userId" attributeType="String"/>
+        <attribute name="voiceEntryUsed" attributeType="Boolean" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="DoctorEntity" representedClassName="DoctorEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="addressData" attributeType="Binary"/>
+        <attribute name="contactIdentifier" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="email" attributeType="String"/>
+        <attribute name="id" attributeType="String"/>
+        <attribute name="isDeletedFlag" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isImportedFromContacts" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="needsSync" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="phoneNumber" attributeType="String"/>
+        <attribute name="specialty" attributeType="String"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userId" attributeType="String"/>
+    </entity>
+    <entity name="MedicationEntity" representedClassName="MedicationEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dosage" attributeType="String"/>
+        <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="frequency" attributeType="String"/>
+        <attribute name="id" attributeType="String"/>
+        <attribute name="isActive" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isDeletedFlag" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="needsSync" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="prescribedBy" optional="YES" attributeType="String"/>
+        <attribute name="scheduleData" attributeType="Binary"/>
+        <attribute name="startDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userId" attributeType="String"/>
+        <attribute name="voiceEntryUsed" attributeType="Boolean" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="SupplementEntity" representedClassName="SupplementEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="brand" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dosage" attributeType="String"/>
+        <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="frequency" attributeType="String"/>
+        <attribute name="id" attributeType="String"/>
+        <attribute name="isActive" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isDeletedFlag" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isTakenWithFood" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String"/>
+        <attribute name="needsSync" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="prescribedBy" optional="YES" attributeType="String"/>
+        <attribute name="purpose" optional="YES" attributeType="String"/>
+        <attribute name="scheduleData" attributeType="Binary"/>
+        <attribute name="startDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="updatedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="userId" attributeType="String"/>
+        <attribute name="voiceEntryUsed" attributeType="Boolean" usesScalarValueType="YES"/>
+    </entity>
 </model>

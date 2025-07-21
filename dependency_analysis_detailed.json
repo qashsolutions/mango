@@ -1,0 +1,146 @@
+{
+  "manager_analysis": {
+    "managers": {
+      "serves": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Networking/FirebaseManager.swift",
+      "ConflictDetectionManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Managers/ConflictDetectionManager.swift",
+      "UserModeManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Managers/UserModeManager.swift",
+      "ExportManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Managers/ExportManager.swift",
+      "SiriIntentsManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Managers/SiriIntentsManager.swift",
+      "NotificationManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Managers/NotificationManager.swift",
+      "MedicationReminderManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Managers/MedicationReminderManager.swift",
+      "VoiceInteractionManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Managers/VoiceInteractionManager.swift",
+      "CaregiverTaskManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Managers/CaregiverTaskManager.swift",
+      "NavigationManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Navigation/NavigationManager.swift",
+      "CoreDataManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Utilities/CoreDataManager.swift",
+      "TaskStorage": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Utilities/DataSyncManager.swift",
+      "KeychainManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Utilities/KeychainManager.swift",
+      "SpeechManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Utilities/SpeechManager.swift",
+      "AnalyticsManager": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Utilities/AnalyticsManager.swift",
+      "AppDelegate": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/App/MedicationManagerApp.swift",
+      "MyHealthViewModel": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Features/MyHealth/MyHealthViewModel.swift",
+      "GroupsViewModel": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Features/Groups/GroupsViewModel.swift",
+      "ConflictsViewModel": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+      "DoctorListViewModel": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Features/DoctorList/DoctorListViewModel.swift"
+    },
+    "dependencies": {
+      "serves": [
+        "GIDSignIn",
+        "UIApplication",
+        "FirebaseManager"
+      ],
+      "ConflictDetectionManager": [
+        "AnalyticsManager",
+        "ClaudeAIClient"
+      ],
+      "UserModeManager": [
+        "FirebaseManager",
+        "AnalyticsManager"
+      ],
+      "ExportManager": [
+        "CoreDataManager",
+        "FirebaseManager",
+        "FileManager",
+        "AnalyticsManager"
+      ],
+      "SiriIntentsManager": [
+        "CoreDataManager",
+        "ConflictDetectionManager",
+        "analyticsManager",
+        "FirebaseManager",
+        "AnalyticsManager"
+      ],
+      "NotificationManager": [
+        "UIApplication",
+        "NavigationManager",
+        "AnalyticsManager"
+      ],
+      "MedicationReminderManager": [
+        "CoreDataManager",
+        "FirebaseManager",
+        "NotificationManager",
+        "AnalyticsManager"
+      ],
+      "VoiceInteractionManager": [
+        "AVAudioSession",
+        "AnalyticsManager"
+      ],
+      "CaregiverTaskManager": [
+        "CoreDataManager",
+        "FirebaseManager",
+        "NotificationManager",
+        "AnalyticsManager"
+      ],
+      "NavigationManager": [
+        "AnalyticsManager"
+      ],
+      "CoreDataManager": [
+        "FirebaseManager",
+        "FileManager",
+        "DataSyncManager",
+        "AnalyticsManager"
+      ],
+      "TaskStorage": [
+        "CoreDataManager",
+        "DataSyncManager"
+      ],
+      "KeychainManager": [],
+      "SpeechManager": [
+        "AVAudioSession"
+      ],
+      "AnalyticsManager": [],
+      "AppDelegate": [
+        "CoreDataManager",
+        "DataSyncManager",
+        "KeychainManager",
+        "firebaseManager",
+        "NavigationManager",
+        "FirebaseManager",
+        "AnalyticsManager"
+      ],
+      "MyHealthViewModel": [
+        "CoreDataManager",
+        "FirebaseManager",
+        "AnalyticsManager",
+        "DataSyncManager"
+      ],
+      "GroupsViewModel": [
+        "FirebaseManager",
+        "AnalyticsManager",
+        "AccessControl"
+      ],
+      "ConflictsViewModel": [
+        "CoreDataManager",
+        "authManager",
+        "DataSyncManager",
+        "ConflictDetectionManager",
+        "voiceManager",
+        "FileManager",
+        "FirebaseManager",
+        "VoiceInteractionManager",
+        "AnalyticsManager"
+      ],
+      "DoctorListViewModel": [
+        "CoreDataManager",
+        "UIApplication",
+        "DataSyncManager",
+        "FirebaseManager",
+        "AnalyticsManager"
+      ]
+    },
+    "circular_dependencies": []
+  },
+  "navigation_issues": [
+    {
+      "file": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Core/Navigation/MainTabView.swift",
+      "issue": "View uses NavigationManager and has navigation destinations"
+    },
+    {
+      "file": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Features/Settings/SettingsView.swift",
+      "issue": "View uses NavigationManager and has navigation destinations"
+    },
+    {
+      "file": "/Users/cvr/Documents/Project/MedicationManager/MedicationManager/Features/Conflicts/ConflictsView.swift",
+      "issue": "View uses NavigationManager and has navigation destinations"
+    }
+  ]
+}

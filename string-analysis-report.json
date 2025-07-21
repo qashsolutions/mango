@@ -1,0 +1,1283 @@
+{
+  "summary": {
+    "total_unique_strings": 1904,
+    "duplicate_strings": 347,
+    "single_use_strings": 1557,
+    "total_occurrences": 2648
+  },
+  "duplicates": {
+    "mg": {
+      "count": 16,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          156
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          168
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          187
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          187
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          188
+        ]
+      ]
+    },
+    "sample-user-id": {
+      "count": 14,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          266
+        ],
+        [
+          "MedicationManager/Core/Models/CaregiverAccess.swift",
+          290
+        ],
+        [
+          "MedicationManager/Core/Models/DietEntry.swift",
+          228
+        ],
+        [
+          "MedicationManager/Core/Models/DietEntry.swift",
+          248
+        ],
+        [
+          "MedicationManager/Core/Models/DietEntry.swift",
+          265
+        ]
+      ]
+    },
+    ", ": {
+      "count": 12,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/ViewMedicationsIntentHandler.swift",
+          136
+        ],
+        [
+          "MedicationIntents/Handlers/ViewMedicationsIntentHandler.swift",
+          147
+        ],
+        [
+          "MedicationManager/Core/Models/CaregiverAccess.swift",
+          102
+        ],
+        [
+          "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+          253
+        ],
+        [
+          "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+          258
+        ]
+      ]
+    },
+    "mcg": {
+      "count": 12,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          156
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          169
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          190
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          191
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          149
+        ]
+      ]
+    },
+    "ibuprofen": {
+      "count": 11,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          149
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          177
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          178
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          184
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          16
+        ]
+      ]
+    },
+    "\\n": {
+      "count": 10,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          262
+        ],
+        [
+          "MedicationManager/Core/Testing/SyncTestRunner.swift",
+          373
+        ],
+        [
+          "MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+          753
+        ],
+        [
+          "MedicationManagerKit/Managers/ExtensionAnalyticsManager.swift",
+          591
+        ],
+        [
+          "MedicationManagerKit/Managers/ExtensionClaudeAPIClient.swift",
+          211
+        ]
+      ]
+    },
+    "daily": {
+      "count": 9,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          149
+        ],
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          150
+        ],
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          216
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          163
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          170
+        ]
+      ]
+    },
+    "aspirin": {
+      "count": 9,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Components/EmptyStateView.swift",
+          311
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          149
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          181
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          182
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          17
+        ]
+      ]
+    },
+    "conflicts": {
+      "count": 9,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Models/CaregiverAccess.swift",
+          132
+        ],
+        [
+          "MedicationManager/Core/Navigation/NavigationManager.swift",
+          346
+        ],
+        [
+          "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+          265
+        ],
+        [
+          "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+          301
+        ],
+        [
+          "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+          6
+        ]
+      ]
+    },
+    "metformin": {
+      "count": 8,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          149
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          179
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          180
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          42
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          110
+        ]
+      ]
+    },
+    "severity": {
+      "count": 8,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+          264
+        ],
+        [
+          "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+          269
+        ],
+        [
+          "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+          300
+        ],
+        [
+          "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+          305
+        ],
+        [
+          "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+          224
+        ]
+      ]
+    },
+    "users": {
+      "count": 8,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Utilities/AccessControl.swift",
+          24
+        ],
+        [
+          "MedicationManager/Core/Utilities/AccessControl.swift",
+          48
+        ],
+        [
+          "MedicationManager/Core/Utilities/AccessControl.swift",
+          204
+        ],
+        [
+          "MedicationManager/Core/Utilities/DataSyncManager.swift",
+          102
+        ],
+        [
+          "MedicationManager/Core/Utilities/DataSyncManager.swift",
+          174
+        ]
+      ]
+    },
+    "User not authenticated": {
+      "count": 7,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          17
+        ],
+        [
+          "MedicationIntents/Handlers/AskMedicalQuestionIntentHandler.swift",
+          17
+        ],
+        [
+          "MedicationIntents/Handlers/CheckConflictsIntentHandler.swift",
+          17
+        ],
+        [
+          "MedicationIntents/Handlers/LogMedicationIntentHandler.swift",
+          17
+        ],
+        [
+          "MedicationIntents/Handlers/SetReminderIntentHandler.swift",
+          18
+        ]
+      ]
+    },
+    "context": {
+      "count": 7,
+      "sample_locations": [
+        [
+          "MedicationManager/App/MedicationManagerApp.swift",
+          337
+        ],
+        [
+          "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+          233
+        ],
+        [
+          "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+          241
+        ],
+        [
+          "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+          275
+        ],
+        [
+          "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+          383
+        ]
+      ]
+    },
+    "ml": {
+      "count": 7,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          157
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          214
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          215
+        ],
+        [
+          "MedicationManagerKit/Models/SendableMedication.swift",
+          145
+        ],
+        [
+          "MedicationManagerKit/Models/SendableMedication.swift",
+          161
+        ]
+      ]
+    },
+    "summary": {
+      "count": 7,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+          276
+        ],
+        [
+          "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+          312
+        ],
+        [
+          "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+          6
+        ],
+        [
+          "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+          20
+        ],
+        [
+          "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+          22
+        ]
+      ]
+    },
+    "caregiverInvitations": {
+      "count": 7,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Utilities/AccessControl.swift",
+          103
+        ],
+        [
+          "MedicationManager/Core/Utilities/AccessControl.swift",
+          146
+        ],
+        [
+          "MedicationManager/Core/Utilities/AccessControl.swift",
+          160
+        ],
+        [
+          "MedicationManager/Core/Utilities/AccessControl.swift",
+          173
+        ],
+        [
+          "MedicationManager/Core/Utilities/AccessControl.swift",
+          183
+        ]
+      ]
+    },
+    "as needed": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          113
+        ],
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          229
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          165
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          179
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          469
+        ]
+      ]
+    },
+    "weekly": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          157
+        ],
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          158
+        ],
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          224
+        ],
+        [
+          "MedicationManager/Core/Models/Supplement.swift",
+          33
+        ],
+        [
+          "MedicationManagerKit/Models/SendableMedication.swift",
+          201
+        ]
+      ]
+    },
+    "once daily": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          217
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          158
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          175
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          469
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          228
+        ]
+      ]
+    },
+    "twice daily": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          219
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          158
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          175
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          469
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          229
+        ]
+      ]
+    },
+    "morning": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/LogMedicationIntentHandler.swift",
+          27
+        ],
+        [
+          "MedicationIntents/Handlers/LogMedicationIntentHandler.swift",
+          177
+        ],
+        [
+          "MedicationIntents/Handlers/ViewMedicationsIntentHandler.swift",
+          101
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          159
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          164
+        ]
+      ]
+    },
+    "evening": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/LogMedicationIntentHandler.swift",
+          28
+        ],
+        [
+          "MedicationIntents/Handlers/LogMedicationIntentHandler.swift",
+          181
+        ],
+        [
+          "MedicationIntents/Handlers/ViewMedicationsIntentHandler.swift",
+          105
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          159
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          164
+        ]
+      ]
+    },
+    "warfarin": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          152
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          71
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          133
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          134
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          204
+        ]
+      ]
+    },
+    "milligrams": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          156
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          189
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          146
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          210
+        ],
+        [
+          "MedicationManagerKit/Models/SendableMedication.swift",
+          176
+        ]
+      ]
+    },
+    "with food": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          159
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          178
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          238
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          238
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          337
+        ]
+      ]
+    },
+    "custom": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Models/Medication.swift",
+          174
+        ],
+        [
+          "MedicationManager/Core/Models/Supplement.swift",
+          35
+        ],
+        [
+          "MedicationManager/Core/Models/User.swift",
+          45
+        ],
+        [
+          "MedicationManager/Features/Conflicts/VoiceQueryView.swift",
+          179
+        ],
+        [
+          "MedicationManagerKit/Models/SendableMedication.swift",
+          202
+        ]
+      ]
+    },
+    "Medication": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Navigation/MainTabView.swift",
+          295
+        ],
+        [
+          "MedicationManager/Intents/MedicationIntents.swift",
+          118
+        ],
+        [
+          "MedicationManager/Intents/MedicationIntents.swift",
+          198
+        ],
+        [
+          "MedicationManager/Intents/MedicationIntents.swift",
+          291
+        ],
+        [
+          "MedicationManagerKit/SharedCoreDataManager.swift",
+          150
+        ]
+      ]
+    },
+    "recommendations": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+          274
+        ],
+        [
+          "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+          310
+        ],
+        [
+          "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+          47
+        ],
+        [
+          "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+          50
+        ],
+        [
+          "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+          54
+        ]
+      ]
+    },
+    "success": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Testing/SyncTestRunner.swift",
+          394
+        ],
+        [
+          "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+          242
+        ],
+        [
+          "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+          337
+        ],
+        [
+          "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+          371
+        ],
+        [
+          "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+          395
+        ]
+      ]
+    },
+    "id == %@": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Utilities/CoreDataManager.swift",
+          88
+        ],
+        [
+          "MedicationManager/Core/Utilities/CoreDataManager.swift",
+          157
+        ],
+        [
+          "MedicationManager/Core/Utilities/CoreDataManager.swift",
+          170
+        ],
+        [
+          "MedicationManager/Core/Utilities/CoreDataManager.swift",
+          233
+        ],
+        [
+          "MedicationManager/Core/Utilities/CoreDataManager.swift",
+          336
+        ]
+      ]
+    },
+    "Emergency Contact": {
+      "count": 6,
+      "sample_locations": [
+        [
+          "MedicationManager/Features/DoctorList/DoctorListViewModel.swift",
+          148
+        ],
+        [
+          "MedicationManager/Features/DoctorList/DoctorListViewModel.swift",
+          148
+        ],
+        [
+          "MedicationManager/Features/DoctorList/DoctorListViewModel.swift",
+          156
+        ],
+        [
+          "MedicationManager/Features/DoctorList/DoctorListViewModel.swift",
+          163
+        ],
+        [
+          "MedicationManager/Features/DoctorList/DoctorListViewModel.swift",
+          172
+        ]
+      ]
+    },
+    "frequency": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          74
+        ],
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          182
+        ],
+        [
+          "MedicationManager/Core/Components/VoiceInputButton.swift",
+          265
+        ],
+        [
+          "MedicationManager/Core/Models/VoiceInteractionContext.swift",
+          12
+        ],
+        [
+          "MedicationManagerKit/SharedCoreDataManager.swift",
+          137
+        ]
+      ]
+    },
+    "monthly": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          159
+        ],
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          160
+        ],
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          226
+        ],
+        [
+          "MedicationManager/Core/Models/User.swift",
+          29
+        ],
+        [
+          "MedicationManagerKit/Models/SendableSupplement.swift",
+          258
+        ]
+      ]
+    },
+    "id": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          178
+        ],
+        [
+          "MedicationIntents/Handlers/SetReminderIntentHandler.swift",
+          226
+        ],
+        [
+          "MedicationManager/Core/Navigation/NavigationManager.swift",
+          90
+        ],
+        [
+          "MedicationManager/Core/Navigation/NavigationManager.swift",
+          97
+        ],
+        [
+          "MedicationManagerKit/SharedCoreDataManager.swift",
+          136
+        ]
+      ]
+    },
+    "name": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          180
+        ],
+        [
+          "MedicationManager/Core/Utilities/CoreDataManager.swift",
+          484
+        ],
+        [
+          "MedicationManagerKit/SharedCoreDataManager.swift",
+          132
+        ],
+        [
+          "MedicationManagerKit/SharedCoreDataManager.swift",
+          136
+        ],
+        [
+          "MedicationManagerKit/SharedCoreDataManager.swift",
+          192
+        ]
+      ]
+    },
+    "three times daily": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/AddMedicationIntentHandler.swift",
+          221
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          175
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          469
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          230
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          335
+        ]
+      ]
+    },
+    "breakfast": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/LogMedicationIntentHandler.swift",
+          177
+        ],
+        [
+          "MedicationIntents/Handlers/ViewMedicationsIntentHandler.swift",
+          101
+        ],
+        [
+          "MedicationManager/Core/Models/DietEntry.swift",
+          33
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          405
+        ],
+        [
+          "MedicationManagerKit/Models/SendableMedication.swift",
+          276
+        ]
+      ]
+    },
+    "lunch": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/LogMedicationIntentHandler.swift",
+          179
+        ],
+        [
+          "MedicationIntents/Handlers/ViewMedicationsIntentHandler.swift",
+          103
+        ],
+        [
+          "MedicationManager/Core/Models/DietEntry.swift",
+          34
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          405
+        ],
+        [
+          "MedicationManagerKit/Models/SendableMedication.swift",
+          277
+        ]
+      ]
+    },
+    "dinner": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationIntents/Handlers/LogMedicationIntentHandler.swift",
+          181
+        ],
+        [
+          "MedicationIntents/Handlers/ViewMedicationsIntentHandler.swift",
+          105
+        ],
+        [
+          "MedicationManager/Core/Models/DietEntry.swift",
+          35
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          405
+        ],
+        [
+          "MedicationManagerKit/Models/SendableMedication.swift",
+          278
+        ]
+      ]
+    },
+    "chevron.right": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Components/MedicationCard.swift",
+          356
+        ],
+        [
+          "MedicationManager/Features/DoctorList/DoctorListView.swift",
+          519
+        ],
+        [
+          "MedicationManager/Features/Groups/GroupsView.swift",
+          498
+        ],
+        [
+          "MedicationManager/Features/Groups/GroupsView.swift",
+          664
+        ],
+        [
+          "MedicationManager/Features/MyHealth/MyHealthView.swift",
+          696
+        ]
+      ]
+    },
+    "acetaminophen": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          149
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          183
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          15
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          140
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          195
+        ]
+      ]
+    },
+    "atorvastatin": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          150
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          36
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          118
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          119
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          198
+        ]
+      ]
+    },
+    "levothyroxine": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          150
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          63
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          131
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          132
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          201
+        ]
+      ]
+    },
+    "omeprazole": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          150
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          57
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          129
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          130
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          200
+        ]
+      ]
+    },
+    "micrograms": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          156
+        ],
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          191
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          150
+        ],
+        [
+          "MedicationManagerKit/Models/SendableMedication.swift",
+          177
+        ],
+        [
+          "MedicationManagerKit/Models/SendableSupplement.swift",
+          205
+        ]
+      ]
+    },
+    "tylenol": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          183
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          15
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          140
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          325
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          192
+        ]
+      ]
+    },
+    "advil": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Configuration/Configuration.swift",
+          184
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          16
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          139
+        ],
+        [
+          "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+          325
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          191
+        ]
+      ]
+    },
+    "Lisinopril": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Models/Medication.swift",
+          224
+        ],
+        [
+          "MedicationManager/Core/Models/MedicationConflict.swift",
+          362
+        ],
+        [
+          "MedicationManager/Core/Models/MedicationConflict.swift",
+          380
+        ],
+        [
+          "MedicationManager/Core/Models/MedicationConflict.swift",
+          413
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          196
+        ]
+      ]
+    },
+    "Metformin": {
+      "count": 5,
+      "sample_locations": [
+        [
+          "MedicationManager/Core/Models/Medication.swift",
+          250
+        ],
+        [
+          "MedicationManager/Core/Models/MedicationConflict.swift",
+          380
+        ],
+        [
+          "MedicationManager/Core/Models/MedicationConflict.swift",
+          386
+        ],
+        [
+          "MedicationManager/Core/Models/MedicationConflict.swift",
+          413
+        ],
+        [
+          "MedicationManager/Core/Utilities/SpeechManager.swift",
+          197
+        ]
+      ]
+    }
+  },
+  "consolidation_suggestions": {},
+  "files_with_most_strings": {
+    "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift": 340,
+    "MedicationManagerKit/Models/SendableSupplement.swift": 147,
+    "MedicationManager/Core/Utilities/AnalyticsManager.swift": 131,
+    "MedicationManager/Core/Configuration/Configuration.swift": 123,
+    "MedicationManager/Core/Utilities/SpeechManager.swift": 105,
+    "MedicationManager/Core/Testing/SyncTestRunner.swift": 97,
+    "MedicationManager/Intents/MedicationIntents.swift": 79,
+    "MedicationManagerKit/Models/SendableMedication.swift": 77,
+    "MedicationIntents/Handlers/AddMedicationIntentHandler.swift": 74,
+    "MedicationManager/Core/Networking/ClaudeAIClient.swift": 74,
+    "MedicationManagerKit/ExtensionError.swift": 72,
+    "MedicationManagerKit/Managers/ExtensionClaudeAPIClient.swift": 71,
+    "MedicationManagerKit/Managers/ExtensionAnalyticsManager.swift": 69,
+    "MedicationManager/Core/Navigation/NavigationManager.swift": 60,
+    "MedicationManager/Core/Utilities/CoreDataManager.swift": 57,
+    "MedicationManager/Features/DoctorList/DoctorListViewModel.swift": 55,
+    "MedicationManager/Core/Models/MedicationConflict.swift": 54,
+    "MedicationManager/Core/Navigation/MainTabView.swift": 52,
+    "MedicationManager/Features/Conflicts/ConflictsViewModel.swift": 48,
+    "MedicationManager/Core/Testing/TestingView.swift": 44
+  }
+}

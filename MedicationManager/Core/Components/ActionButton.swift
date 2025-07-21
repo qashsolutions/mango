@@ -30,7 +30,7 @@ struct ActionButton: View {
                         .progressViewStyle(CircularProgressViewStyle(tint: style.foregroundColor))
                 } else if let icon = style.icon {
                     Image(systemName: icon)
-                        .font(.system(size: 16, weight: .medium))
+                        .font(AppTheme.Typography.body)
                 }
                 
                 Text(title)
@@ -171,7 +171,7 @@ struct CompactActionButton: View {
                         .progressViewStyle(CircularProgressViewStyle(tint: style.foregroundColor))
                 } else if let icon = style.icon {
                     Image(systemName: icon)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(AppTheme.Typography.caption)
                 }
                 
                 Text(title)
@@ -275,9 +275,9 @@ struct FloatingActionButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 24, weight: .medium))
+                .font(AppTheme.Typography.title)
                 .foregroundColor(AppTheme.Colors.onPrimary)
-                .frame(width: 56, height: 56)
+                .frame(width: AppTheme.Sizing.iconLarge, height: AppTheme.Sizing.iconLarge)
                 .background(AppTheme.Colors.primary)
                 .cornerRadius(28)
                 .shadow(
@@ -294,7 +294,7 @@ struct FloatingActionButton: View {
 // MARK: - Specialized Action Buttons
 struct VoiceActionButton: View {
     let onVoiceResult: (String) -> Void
-    let context: VoiceInputContext
+    let context: VoiceInteractionContext
     
     var body: some View {
         CompactActionButton(
@@ -305,31 +305,6 @@ struct VoiceActionButton: View {
         .overlay(
             VoiceInputButton(context: context, onResult: onVoiceResult)
                 .scaleEffect(0.6)
-        )
-    }
-}
-
-struct SyncActionButton: View {
-    @StateObject private var dataSync = DataSyncManager.shared
-    
-    var body: some View {
-        IconActionButton(
-            icon: "arrow.clockwise",
-            action: {
-                Task {
-                    await dataSync.forceSyncAll()
-                }
-            },
-            style: .ghost,
-            size: .medium
-        )
-        .disabled(dataSync.isSyncing || !dataSync.isOnline)
-        .overlay(
-            dataSync.isSyncing ? 
-                ProgressView()
-                    .scaleEffect(0.7)
-                    .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.primary))
-                : nil
         )
     }
 }

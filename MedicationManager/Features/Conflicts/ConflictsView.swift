@@ -1,114 +1,343 @@
 import SwiftUI
 
 struct ConflictsView: View {
-    @StateObject private var viewModel = ConflictsViewModel()
-    @StateObject private var navigationManager = NavigationManager.shared
+    @State private var viewModel = ConflictsViewModel()
     @State private var showingCheckConfirmation: Bool = false
+    @State private var showingVoiceQuery: Bool = false
+    @State private var showingAnalysisHistory: Bool = false
+    @State private var showingSiriTips: Bool = false
+    @State private var navigationPath = NavigationPath()
+    // Use singletons directly - they manage their own lifecycle with @Observable
+    private let navigationManager = NavigationManager.shared
+    private let siriManager = SiriIntentsManager.shared
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                if viewModel.isLoading {
-                    LoadingState(message: AppStrings.Conflicts.analyzingConflicts)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    ScrollView {
-                        LazyVStack(spacing: AppTheme.Spacing.large) {
-                            // Conflict Summary Header
-                            ConflictSummaryHeader(
-                                summary: viewModel.conflictSummary,
-                                onCheckConflicts: {
-                                    showingCheckConfirmation = true
-                                }
-                            )
-                            
-                            if viewModel.conflicts.isEmpty {
-                                // No Conflicts State
-                                ConflictEmptyState(onCheckConflicts: {
-                                    showingCheckConfirmation = true
-                                })
-                            } else {
-                                // Critical Conflicts Section
-                                if !viewModel.criticalConflicts.isEmpty {
-                                    CriticalConflictsSection(
-                                        conflicts: viewModel.criticalConflicts,
-                                        onConflictTap: { conflict in
-                                            navigationManager.navigate(to: .conflictDetail(id: conflict.id))
-                                        },
-                                        onResolveConflict: { conflict in
-                                            Task {
-                                                await viewModel.resolveConflict(conflict)
-                                            }
-                                        }
-                                    )
-                                }
-                                
-                                // All Conflicts Section
-                                AllConflictsSection(
-                                    conflicts: viewModel.conflicts,
-                                    onConflictTap: { conflict in
-                                        navigationManager.navigate(to: .conflictDetail(id: conflict.id))
-                                    },
-                                    onFilterChange: { filter in
-                                        viewModel.updateFilter(filter)
-                                    }
-                                )
+        NavigationStack(path: $navigationPath) {
+            ZStack {
+                contentView
+                
+                // Floating Voice Button
+                if !viewModel.isAnalyzing && !viewModel.isLoading {
+                    FloatingVoiceCommandButton(
+                        action: {
+                            showingVoiceQuery = true
+                            AnalyticsManager.shared.trackFeatureUsed("voice_conflict_check")
+                        },
+                        context: .conflictQuery
+                    )
+                }
+            }
+            .navigationTitle(AppStrings.TabTitles.conflicts)
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    HStack(spacing: AppTheme.Spacing.small) {
+                        // Siri Button
+                        if #available(iOS 18.0, *) {
+                            Button(action: { showingSiriTips = true }) {
+                                Image(systemName: AppIcons.siri)
+                                    .font(AppTheme.Typography.callout)
+                                    .foregroundColor(AppTheme.Colors.primary)
                             }
-                            
-                            // Educational Section
-                            ConflictEducationSection()
                         }
-                        .padding(.horizontal, AppTheme.Spacing.medium)
-                        .padding(.bottom, AppTheme.Spacing.extraLarge)
+                        
+                        // History Button
+                        if viewModel.hasCachedResults {
+                            Button(action: { showingAnalysisHistory = true }) {
+                                Image(systemName: AppIcons.history)
+                                    .font(AppTheme.Typography.callout)
+                            }
+                        }
+                        
+                        // Manual Check Button
+                        Button(action: { showingCheckConfirmation = true }) {
+                            Image(systemName: AppIcons.conflicts)
+                                .font(AppTheme.Typography.callout)
+                        }
+                        .disabled(viewModel.isAnalyzing)
                     }
                 }
             }
             .refreshable {
                 await viewModel.refreshData()
             }
-            .navigationTitle(AppStrings.Tabs.conflicts)
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack(spacing: AppTheme.Spacing.small) {
-                        SyncActionButton()
-                        
-                        Button(action: { showingCheckConfirmation = true }) {
-                            Image(systemName: AppIcons.conflicts)
-                                .font(.system(size: 18, weight: .medium))
-                        }
-                        .disabled(viewModel.isAnalyzing)
+            .onAppear {
+                // TODO: Fix DynamicShortcutsManager reference - class not found
+                // DynamicShortcutsManager.trackConflictViewOpened()
+                // Update Siri shortcuts based on user behavior
+                if FirebaseManager.shared.currentUser?.id != nil {
+                    Task {
+                        // TODO: Fix DynamicShortcutsManager reference - class not found
+                        // await DynamicShortcutsManager.shared.updateShortcuts(for: userId)
                     }
                 }
+            }
+            .sheet(isPresented: $showingVoiceQuery) {
+                VoiceQueryView(
+                    onAnalyze: { query in
+                        Task {
+                            await viewModel.analyzeQuery(query)
+                            // Donate intent after voice query
+                            siriManager.donateIntent(for: .voiceQuery(query))
+                        }
+                    }
+                )
+            }
+            .sheet(isPresented: $showingAnalysisHistory) {
+                ConflictHistoryView(
+                    analysisHistory: viewModel.analysisHistory,
+                    onSelectAnalysis: { analysis in
+                        viewModel.currentAnalysis = analysis
+                        showingAnalysisHistory = false
+                    }
+                )
+            }
+            .sheet(isPresented: $showingSiriTips) {
+                // TODO: Fix SiriTipsView reference - class not found
+                // if #available(iOS 18.0, *) {
+                //     SiriTipsView()
+                //         .presentationDetents([.large])
+                //         .presentationDragIndicator(.visible)
+                //         .overlay(alignment: .top) {
+                //             HStack {
+                //                 Text(AppStrings.Siri.siriTipsTitle)
+                //                     .font(AppTheme.Typography.headline)
+                //                 Spacer()
+                //                 Button(AppStrings.Common.done) {
+                //                     showingSiriTips = false
+                //                 }
+                //                 .font(AppTheme.Typography.body)
+                //                 .foregroundColor(AppTheme.Colors.primary)
+                //             }
+                //             .padding()
+                //         }
+                // }
+                EmptyView()
+            }
+            .navigationDestination(for: ConflictDetectionManager.MedicationConflictAnalysis.self) { analysis in
+                ConflictAnalysisView(analysis: analysis)
             }
             .alert(AppStrings.Conflicts.checkConfirmation, isPresented: $showingCheckConfirmation) {
                 Button(AppStrings.Common.analyze) {
                     Task {
                         await viewModel.checkForConflicts()
+                        // Donate intent after conflict check
+                        siriManager.donateIntent(for: .checkConflicts)
+                        // TODO: Fix DynamicShortcutsManager reference - class not found
+                        // DynamicShortcutsManager.trackConflictAnalysisCompleted()
                     }
                 }
                 Button(AppStrings.Common.cancel, role: .cancel) {}
             } message: {
                 Text(AppStrings.Conflicts.checkConfirmationMessage)
             }
-            .alert(item: Binding<AlertItem?>(
-                get: { viewModel.error.map { AlertItem.fromError($0) } },
-                set: { _ in viewModel.clearError() }
-            )) { alertItem in
-                Alert(
-                    title: Text(alertItem.title),
-                    message: Text(alertItem.message),
-                    dismissButton: .default(Text(AppStrings.Common.ok))
+            .alert(
+                AppStrings.Errors.title,
+                isPresented: Binding<Bool>(
+                    get: { viewModel.error != nil },
+                    set: { _ in viewModel.clearError() }
                 )
+            ) {
+                Button(AppStrings.Common.ok) {
+                    viewModel.clearError()
+                }
+                if viewModel.error?.isRetryable == true {
+                    Button(AppStrings.Common.retry) {
+                        Task {
+                            await viewModel.retryLastAction()
+                        }
+                    }
+                }
+            } message: {
+                Text(viewModel.error?.localizedDescription ?? AppStrings.ErrorMessages.genericError)
             }
         }
         .task {
             await viewModel.loadData()
         }
     }
+    
+    // MARK: - Content View
+    @ViewBuilder
+    private var contentView: some View {
+        Group {
+            if viewModel.isLoading {
+                loadingView()
+            } else if viewModel.isAnalyzing {
+                analyzingView()
+            } else {
+                mainContentView()
+            }
+        }
+    }
+    
+    // MARK: - Loading View
+    @ViewBuilder
+    private func loadingView() -> some View {
+        VStack(spacing: AppTheme.Spacing.large) {
+            ProgressView()
+                .scaleEffect(1.2)
+                .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.primary))
+            
+            Text(AppStrings.Common.loading)
+                .font(AppTheme.Typography.body)
+                .foregroundColor(AppTheme.Colors.secondaryText)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    // MARK: - Analyzing View
+    private func analyzingView() -> some View {
+        VStack(spacing: AppTheme.Spacing.large) {
+            ProgressView()
+                .scaleEffect(1.2)
+                .progressViewStyle(CircularProgressViewStyle(tint: AppTheme.Colors.primary))
+            
+            if viewModel.voiceQueryText.isEmpty {
+                Text(AppStrings.AI.analyzingMedications)
+                    .font(AppTheme.Typography.body)
+                    .foregroundColor(AppTheme.Colors.secondaryText)
+            } else {
+                Text(AppStrings.AI.analyzingQuery)
+                    .font(AppTheme.Typography.body)
+                    .foregroundColor(AppTheme.Colors.secondaryText)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    // MARK: - Main Content
+    @ViewBuilder
+    private func mainContentView() -> some View {
+        ScrollView {
+            LazyVStack(spacing: AppTheme.Spacing.large) {
+                // Voice Query Section
+                if Configuration.Voice.showVoicePrompt {
+                    VoiceQueryPromptCard(onTap: {
+                        showingVoiceQuery = true
+                    })
+                }
+                
+                // Current Analysis Result
+                if let analysis = viewModel.currentAnalysis {
+                    let medicationConflict = MedicationConflict.fromAnalysis(
+                        analysis,
+                        userId: FirebaseManager.shared.currentUser?.id ?? ""
+                    )
+                    AIAnalysisCard(
+                        analysis: medicationConflict,
+                        onViewDetails: {
+                            navigationPath.append(analysis)
+                        },
+                        onDismiss: {
+                            withAnimation {
+                                viewModel.currentAnalysis = nil
+                            }
+                        }
+                    )
+                }
+                
+                // Conflict Summary Header
+                ConflictSummaryHeader(
+                    summary: viewModel.conflictSummary,
+                    onCheckConflicts: {
+                        showingCheckConfirmation = true
+                        AnalyticsManager.shared.trackFeatureUsed("conflict_check_button")
+                    }
+                )
+                
+                if viewModel.conflicts.isEmpty {
+                    emptyStateView()
+                } else {
+                    // Critical Conflicts Section
+                    if !viewModel.criticalConflicts.isEmpty {
+                        CriticalConflictsSection(
+                            conflicts: viewModel.criticalConflicts,
+                            onResolveConflict: { conflict in
+                                Task {
+                                    await viewModel.resolveConflict(conflict)
+                                }
+                            }
+                        )
+                    }
+                    
+                    // All Conflicts Section
+                    AllConflictsSection(
+                        conflicts: viewModel.filteredConflicts,
+                        currentFilter: viewModel.currentFilter,
+                        filterCounts: viewModel.filterCounts,
+                        onFilterChange: { filter in
+                            viewModel.updateFilter(filter)
+                        }
+                    )
+                }
+                
+                // Educational Section
+                ConflictEducationSection()
+            }
+            .padding(.horizontal, AppTheme.Spacing.medium)
+            .padding(.bottom, AppTheme.Spacing.extraLarge + 80) // Extra space for floating button
+        }
+    }
+    
+    // MARK: - Empty State
+    @ViewBuilder
+    private func emptyStateView() -> some View {
+        ConflictEmptyState(
+            onCheckConflicts: {
+                showingCheckConfirmation = true
+            }
+        )
+        .padding(.vertical, AppTheme.Spacing.extraLarge)
+    }
 }
 
-// MARK: - Conflict Summary Header
+// MARK: - Voice Query Prompt Card
+struct VoiceQueryPromptCard: View {
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: AppTheme.Spacing.medium) {
+                Image(systemName: AppIcons.voiceInput)
+                    .font(AppTheme.Typography.title)
+                    .foregroundColor(AppTheme.Colors.voiceActive)
+                    .frame(width: AppTheme.Sizing.iconMedium, height: AppTheme.Sizing.iconMedium)
+                    .background(AppTheme.Colors.voiceActive.opacity(AppTheme.Opacity.low))
+                    .clipShape(Circle())
+                
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.extraSmall) {
+                    Text(AppStrings.Voice.askAboutMedications)
+                        .font(AppTheme.Typography.subheadline)
+                        .foregroundColor(AppTheme.Colors.primaryText)
+                    
+                    Text(AppStrings.Voice.exampleQueries)
+                        .font(AppTheme.Typography.caption1)
+                        .foregroundColor(AppTheme.Colors.secondaryText)
+                        .lineLimit(2)
+                }
+                
+                Spacer()
+                
+                Image(systemName: AppIcons.chevronRight)
+                    .font(AppTheme.Typography.footnote)
+                    .foregroundColor(AppTheme.Colors.tertiaryText)
+            }
+            .padding(AppTheme.Spacing.medium)
+            .background(
+                RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium)
+                    .fill(AppTheme.Colors.voiceActive.opacity(0.05))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium)
+                    .stroke(AppTheme.Colors.voiceActive.opacity(AppTheme.Opacity.low), lineWidth: 1)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+// MARK: - Updated Conflict Summary Header
 struct ConflictSummaryHeader: View {
     let summary: ConflictAnalysisSummary
     let onCheckConflicts: () -> Void
@@ -134,12 +363,20 @@ struct ConflictSummaryHeader: View {
                 
                 Spacer()
                 
-                ActionButton(
-                    title: AppStrings.Conflicts.checkNow,
-                    action: onCheckConflicts,
-                    style: summary.requiresAttention ? .warning : .primary
-                )
-                .frame(width: 120)
+                Button(action: onCheckConflicts) {
+                    HStack(spacing: AppTheme.Spacing.extraSmall) {
+                        Image(systemName: AppIcons.conflicts)
+                            .font(AppTheme.Typography.caption)
+                        Text(AppStrings.Conflicts.checkNow)
+                            .font(AppTheme.Typography.caption1)
+                    }
+                    .padding(.horizontal, AppTheme.Spacing.small)
+                    .padding(.vertical, AppTheme.Spacing.extraSmall)
+                    .foregroundColor(AppTheme.Colors.onPrimary)
+                    .background(AppTheme.Colors.primary)
+                    .cornerRadius(AppTheme.CornerRadius.small)
+                }
+                .buttonStyle(PlainButtonStyle())
             }
             
             // Statistics
@@ -178,12 +415,6 @@ struct ConflictSummaryHeader: View {
                     lineWidth: summary.requiresAttention ? 2 : 1
                 )
         )
-        .shadow(
-            color: AppTheme.Shadow.large.color,
-            radius: AppTheme.Shadow.large.radius,
-            x: AppTheme.Shadow.large.x,
-            y: AppTheme.Shadow.large.y
-        )
     }
 }
 
@@ -197,7 +428,7 @@ struct ConflictStatistic: View {
         VStack(spacing: AppTheme.Spacing.small) {
             HStack(spacing: AppTheme.Spacing.extraSmall) {
                 Image(systemName: icon)
-                    .font(.system(size: 12))
+                    .font(AppTheme.Typography.caption)
                     .foregroundColor(color)
                 
                 Text(value)
@@ -215,54 +446,12 @@ struct ConflictStatistic: View {
     }
 }
 
-// MARK: - Critical Conflicts Section
-struct CriticalConflictsSection: View {
-    let conflicts: [MedicationConflict]
-    let onConflictTap: (MedicationConflict) -> Void
-    let onResolveConflict: (MedicationConflict) -> Void
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: AppTheme.Spacing.medium) {
-            HStack {
-                Image(systemName: AppIcons.critical)
-                    .font(.system(size: 16))
-                    .foregroundColor(AppTheme.Colors.error)
-                
-                Text(AppStrings.Conflicts.criticalConflicts)
-                    .font(AppTheme.Typography.title3)
-                    .foregroundColor(AppTheme.Colors.primaryText)
-                
-                Spacer()
-                
-                Text(AppStrings.Conflicts.requiresAttention)
-                    .font(AppTheme.Typography.caption2)
-                    .foregroundColor(AppTheme.Colors.error)
-                    .padding(.horizontal, AppTheme.Spacing.small)
-                    .padding(.vertical, AppTheme.Spacing.extraSmall)
-                    .background(AppTheme.Colors.errorBackground)
-                    .cornerRadius(AppTheme.CornerRadius.small)
-            }
-            
-            VStack(spacing: AppTheme.Spacing.small) {
-                ForEach(conflicts, id: \.id) { conflict in
-                    ConflictCard(
-                        conflict: conflict,
-                        onTap: { onConflictTap(conflict) },
-                        onResolve: { onResolveConflict(conflict) },
-                        showResolveAction: !conflict.isResolved
-                    )
-                }
-            }
-        }
-    }
-}
-
-// MARK: - All Conflicts Section
+// MARK: - Updated All Conflicts Section
 struct AllConflictsSection: View {
     let conflicts: [MedicationConflict]
-    let onConflictTap: (MedicationConflict) -> Void
-    let onFilterChange: (ConflictFilter) -> Void
-    @State private var selectedFilter: ConflictFilter = .all
+    let currentFilter: ConflictFilterType
+    let filterCounts: [ConflictFilterType: Int]
+    let onFilterChange: (ConflictFilterType) -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.medium) {
@@ -273,15 +462,28 @@ struct AllConflictsSection: View {
                 
                 Spacer()
                 
-                // Filter Picker
-                Picker(AppStrings.Common.filter, selection: $selectedFilter) {
-                    ForEach(ConflictFilter.allCases, id: \.self) { filter in
-                        Text(filter.displayName).tag(filter)
+                // Filter Menu
+                Menu {
+                    ForEach(ConflictFilterType.allCases, id: \.self) { filter in
+                        Button(action: { onFilterChange(filter) }) {
+                            HStack {
+                                Text(filter.displayName)
+                                if let count = filterCounts[filter] {
+                                    Spacer()
+                                    Text("\(count)")
+                                        .foregroundColor(AppTheme.Colors.secondaryText)
+                                }
+                            }
+                        }
                     }
-                }
-                .pickerStyle(MenuPickerStyle())
-                .onChange(of: selectedFilter) { _, newFilter in
-                    onFilterChange(newFilter)
+                } label: {
+                    HStack(spacing: AppTheme.Spacing.extraSmall) {
+                        Text(currentFilter.displayName)
+                            .font(AppTheme.Typography.caption1)
+                        Image(systemName: AppIcons.chevronDown)
+                            .font(AppTheme.Typography.caption)
+                    }
+                    .foregroundColor(AppTheme.Colors.primary)
                 }
             }
             
@@ -295,7 +497,6 @@ struct AllConflictsSection: View {
                     ForEach(conflicts, id: \.id) { conflict in
                         ConflictCard(
                             conflict: conflict,
-                            onTap: { onConflictTap(conflict) },
                             onResolve: nil,
                             showResolveAction: false
                         )
@@ -306,114 +507,144 @@ struct AllConflictsSection: View {
     }
 }
 
-// MARK: - Conflict Card
+// MARK: - Critical Conflicts Section (unchanged)
+struct CriticalConflictsSection: View {
+    let conflicts: [MedicationConflict]
+    let onResolveConflict: (MedicationConflict) -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.medium) {
+            HStack {
+                Image(systemName: AppIcons.critical)
+                    .font(AppTheme.Typography.body)
+                    .foregroundColor(AppTheme.Colors.error)
+                
+                Text(AppStrings.Conflicts.criticalConflicts)
+                    .font(AppTheme.Typography.title3)
+                    .foregroundColor(AppTheme.Colors.primaryText)
+                
+                Spacer()
+                
+                SeverityAlertBanner(
+                    severity: .critical,
+                    message: AppStrings.Conflicts.requiresAttention,
+                    onDismiss: nil
+                )
+            }
+            
+            VStack(spacing: AppTheme.Spacing.small) {
+                ForEach(conflicts, id: \.id) { conflict in
+                    ConflictCard(
+                        conflict: conflict,
+                        onResolve: { onResolveConflict(conflict) },
+                        showResolveAction: !conflict.isResolved
+                    )
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Updated Conflict Card
 struct ConflictCard: View {
     let conflict: MedicationConflict
-    let onTap: () -> Void
     let onResolve: (() -> Void)?
     let showResolveAction: Bool
     
     var body: some View {
-        Button(action: onTap) {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.medium) {
-                // Header
-                HStack {
-                    VStack(alignment: .leading, spacing: AppTheme.Spacing.extraSmall) {
-                        HStack(spacing: AppTheme.Spacing.small) {
-                            Image(systemName: conflict.highestSeverity.icon)
-                                .font(.system(size: 14))
-                                .foregroundColor(severityColor)
-                            
-                            Text(conflict.displaySummary)
-                                .font(AppTheme.Typography.subheadline)
-                                .foregroundColor(AppTheme.Colors.primaryText)
-                                .lineLimit(1)
-                        }
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.medium) {
+            // Header
+            HStack {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.extraSmall) {
+                    HStack(spacing: AppTheme.Spacing.small) {
+                        ConflictSeverityBadge(
+                            severity: conflict.highestSeverity,
+                            size: .small,
+                            showLabel: false
+                        )
+                        
+                        Text(conflict.displaySummary)
+                            .font(AppTheme.Typography.subheadline)
+                            .foregroundColor(AppTheme.Colors.primaryText)
+                            .lineLimit(1)
+                    }
+                    
+                    HStack(spacing: AppTheme.Spacing.small) {
+                        Image(systemName: AppIcons.ai)
+                            .font(AppTheme.Typography.caption)
+                            .foregroundColor(AppTheme.Colors.secondaryText)
                         
                         Text(AppStrings.Conflicts.analyzedBySource(conflict.source.displayName))
                             .font(AppTheme.Typography.caption1)
                             .foregroundColor(AppTheme.Colors.secondaryText)
                     }
-                    
-                    Spacer()
-                    
-                    VStack(alignment: .trailing, spacing: AppTheme.Spacing.extraSmall) {
-                        Text(conflict.highestSeverity.displayName)
-                            .font(AppTheme.Typography.caption1)
-                            .foregroundColor(severityColor)
-                            .padding(.horizontal, AppTheme.Spacing.small)
-                            .padding(.vertical, AppTheme.Spacing.extraSmall)
-                            .background(severityColor.opacity(0.1))
-                            .cornerRadius(AppTheme.CornerRadius.small)
-                        
-                        if conflict.isResolved {
-                            Text(AppStrings.Conflicts.resolved)
-                                .font(AppTheme.Typography.caption2)
-                                .foregroundColor(AppTheme.Colors.success)
-                        }
-                    }
                 }
                 
-                // Involved Medications
-                MedicationsInvolvedView(
-                    medications: conflict.medications,
-                    supplements: conflict.supplements
-                )
+                Spacer()
                 
-                // Quick Info
-                if conflict.hasActionableRecommendations {
-                    HStack(spacing: AppTheme.Spacing.small) {
-                        Image(systemName: AppIcons.recommendations)
-                            .font(.system(size: 12))
-                            .foregroundColor(AppTheme.Colors.primary)
-                        
-                        Text(AppStrings.Conflicts.recommendationsCount(conflict.recommendations.count))
-                            .font(AppTheme.Typography.caption1)
-                            .foregroundColor(AppTheme.Colors.secondaryText)
-                        
-                        Spacer()
-                        
-                        Text(conflict.createdAt.formatted(.relative(presentation: .numeric)))
+                VStack(alignment: .trailing, spacing: AppTheme.Spacing.extraSmall) {
+                    ConflictSeverityBadge(
+                        severity: conflict.highestSeverity,
+                        size: .small
+                    )
+                    
+                    if conflict.isResolved {
+                        Text(AppStrings.Conflicts.resolved)
                             .font(AppTheme.Typography.caption2)
-                            .foregroundColor(AppTheme.Colors.tertiaryText)
-                    }
-                }
-                
-                // Action Button
-                if showResolveAction, let onResolve = onResolve {
-                    HStack {
-                        Spacer()
-                        
-                        CompactActionButton(
-                            title: AppStrings.Conflicts.markResolved,
-                            action: onResolve,
-                            style: .success
-                        )
+                            .foregroundColor(AppTheme.Colors.success)
                     }
                 }
             }
-            .padding(AppTheme.Spacing.medium)
-            .background(cardBackgroundColor)
-            .cornerRadius(AppTheme.CornerRadius.medium)
-            .overlay(
-                RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium)
-                    .stroke(borderColor, lineWidth: borderWidth)
+            
+            // Involved Medications
+            MedicationsInvolvedView(
+                medications: conflict.medications,
+                supplements: conflict.supplements
             )
+            
+            // Quick Info
+            if conflict.hasActionableRecommendations {
+                HStack(spacing: AppTheme.Spacing.small) {
+                    Image(systemName: AppIcons.recommendations)
+                        .font(AppTheme.Typography.caption)
+                        .foregroundColor(AppTheme.Colors.primary)
+                    
+                    Text(AppStrings.Conflicts.recommendationsCount(conflict.recommendations.count))
+                        .font(AppTheme.Typography.caption1)
+                        .foregroundColor(AppTheme.Colors.secondaryText)
+                    
+                    Spacer()
+                    
+                    Text(conflict.createdAt.formatted(.relative(presentation: .numeric)))
+                        .font(AppTheme.Typography.caption2)
+                        .foregroundColor(AppTheme.Colors.tertiaryText)
+                }
+            }
+            
+            // Action Button
+            if showResolveAction, let onResolve = onResolve {
+                HStack {
+                    Spacer()
+                    
+                    Button(action: onResolve) {
+                        Text(AppStrings.Conflicts.markResolved)
+                            .font(AppTheme.Typography.caption1)
+                            .foregroundColor(AppTheme.Colors.onPrimary)
+                            .padding(.horizontal, AppTheme.Spacing.medium)
+                            .padding(.vertical, AppTheme.Spacing.small)
+                            .background(AppTheme.Colors.success)
+                            .cornerRadius(AppTheme.CornerRadius.small)
+                    }
+                }
+            }
         }
-        .buttonStyle(PlainButtonStyle())
-    }
-    
-    private var severityColor: Color {
-        switch conflict.highestSeverity {
-        case .low:
-            return AppTheme.Colors.success
-        case .medium:
-            return AppTheme.Colors.warning
-        case .high:
-            return AppTheme.Colors.error
-        case .critical:
-            return AppTheme.Colors.critical
-        }
+        .padding(AppTheme.Spacing.medium)
+        .background(cardBackgroundColor)
+        .cornerRadius(AppTheme.CornerRadius.medium)
+        .overlay(
+            RoundedRectangle(cornerRadius: AppTheme.CornerRadius.medium)
+                .stroke(borderColor, lineWidth: borderWidth)
+        )
     }
     
     private var cardBackgroundColor: Color {
@@ -439,7 +670,7 @@ struct ConflictCard: View {
     }
 }
 
-// MARK: - Medications Involved View
+// MARK: - Medications Involved View (unchanged)
 struct MedicationsInvolvedView: View {
     let medications: [String]
     let supplements: [String]
@@ -447,7 +678,7 @@ struct MedicationsInvolvedView: View {
     var body: some View {
         HStack(spacing: AppTheme.Spacing.small) {
             Image(systemName: AppIcons.medications)
-                .font(.system(size: 12))
+                .font(AppTheme.Typography.caption)
                 .foregroundColor(AppTheme.Colors.primary)
             
             Text(involvementText)
@@ -463,16 +694,16 @@ struct MedicationsInvolvedView: View {
         var components: [String] = []
         
         if !medications.isEmpty {
-            if medications.count == 1 {
-                components.append(medications.first!)
+            if medications.count == 1, let firstMedication = medications.first {
+                components.append(firstMedication)
             } else {
                 components.append(AppStrings.Conflicts.medicationCountValue(medications.count))
             }
         }
         
         if !supplements.isEmpty {
-            if supplements.count == 1 {
-                components.append(supplements.first!)
+            if supplements.count == 1, let firstSupplement = supplements.first {
+                components.append(firstSupplement)
             } else {
                 components.append(AppStrings.Conflicts.supplementCountValue(supplements.count))
             }
@@ -482,7 +713,7 @@ struct MedicationsInvolvedView: View {
     }
 }
 
-// MARK: - Conflict Education Section
+// MARK: - Updated Conflict Education Section
 struct ConflictEducationSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.medium) {
@@ -493,14 +724,14 @@ struct ConflictEducationSection: View {
             VStack(spacing: AppTheme.Spacing.small) {
                 EducationCard(
                     icon: AppIcons.ai,
-                    title: AppStrings.Conflicts.aiPowered,
-                    description: AppStrings.Conflicts.aiPoweredDescription
+                    title: AppStrings.AI.poweredByClaude,
+                    description: AppStrings.AI.claudeDescription
                 )
                 
                 EducationCard(
-                    icon: AppIcons.realtime,
-                    title: AppStrings.Conflicts.realtimeChecking,
-                    description: AppStrings.Conflicts.realtimeCheckingDescription
+                    icon: AppIcons.voiceInput,
+                    title: AppStrings.Voice.voiceFirst,
+                    description: AppStrings.Voice.voiceFirstDescription
                 )
                 
                 EducationCard(
@@ -521,9 +752,9 @@ struct EducationCard: View {
     var body: some View {
         HStack(alignment: .top, spacing: AppTheme.Spacing.medium) {
             Image(systemName: icon)
-                .font(.system(size: 16))
+                .font(AppTheme.Typography.body)
                 .foregroundColor(AppTheme.Colors.primary)
-                .frame(width: 24, height: 24)
+                .frame(width: AppTheme.Sizing.iconSmall, height: AppTheme.Sizing.iconSmall)
             
             VStack(alignment: .leading, spacing: AppTheme.Spacing.extraSmall) {
                 Text(title)
@@ -537,35 +768,8 @@ struct EducationCard: View {
             }
         }
         .padding(AppTheme.Spacing.medium)
-        .background(AppTheme.Colors.infoBackground)
+        .background(AppTheme.Colors.primaryBackground)
         .cornerRadius(AppTheme.CornerRadius.medium)
-    }
-}
-
-// MARK: - Conflict Filter
-enum ConflictFilter: String, CaseIterable {
-    case all = "all"
-    case critical = "critical"
-    case high = "high"
-    case unresolved = "unresolved"
-    case resolved = "resolved"
-    case recent = "recent"
-    
-    var displayName: String {
-        switch self {
-        case .all:
-            return AppStrings.Common.all
-        case .critical:
-            return AppStrings.Conflicts.critical
-        case .high:
-            return AppStrings.Conflicts.high
-        case .unresolved:
-            return AppStrings.Conflicts.unresolved
-        case .resolved:
-            return AppStrings.Conflicts.resolved
-        case .recent:
-            return AppStrings.Conflicts.recent
-        }
     }
 }
 

@@ -1,0 +1,162 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2821
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fmodern\fcharset0 Courier-Bold;\f1\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red253\green161\blue46;\red21\green102\blue47;\red255\green238\blue149;
+\red185\green176\blue255;\red0\green0\blue152;\red47\green149\blue121;\red86\green219\blue233;\red97\green0\blue1;
+}
+{\*\expandedcolortbl;;\cssrgb\c100000\c69020\c23137;\cssrgb\c7451\c46667\c23922;\cssrgb\c100000\c94118\c64706;
+\cssrgb\c77463\c75590\c100000;\cssrgb\c0\c0\c66135;\csgenericrgb\c18421\c58339\c47457;\cssrgb\c38886\c88040\c93077;\cssrgb\c46062\c0\c0;
+}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\b\fs42 \cf2 \cb3 \CocoaLigature0 . Fix DynamicShortcutsManager 
+\f1\b0 \cf4 \
+  
+\f0\b \cf2 References
+\f1\b0 \cf4 \
+\
+  
+\f0\b \cf2 Error
+\f1\b0 \cf4 : \cf5 cannot find \cf4 \
+  'DynamicShortcutsManager' in scope in\
+  ConflictsViewModel.swift\
+  
+\f0\b \cf2 Why
+\f1\b0 \cf4 : The codebase has existing Siri\
+  integration that references this class,\
+   but the class definition is missing\
+  
+\f0\b \cf2 Action
+\f1\b0 \cf4 : Either:\
+  - Find where DynamicShortcutsManager\
+  was originally defined, OR\
+  - Comment out lines 317 and 366 in\
+  ConflictsViewModel.swift to make the\
+  app compile\
+\
+  
+\f0\b \cf2 2. Fix Memory Pressure Issue (malloc: 
+\f1\b0 \cf4 \
+  
+\f0\b \cf2 nano zone)
+\f1\b0 \cf4 \
+\
+  
+\f0\b \cf2 Status
+\f1\b0 \cf4 : \uc0\u9989  Partially Fixed\
+  
+\f0\b \cf2 What we did
+\f1\b0 \cf4 :\
+  - Fixed CoreDataManager deferred\
+  loading\
+  - Fixed DIContainer lazy loading\
+  
+\f0\b \cf2 Still needed
+\f1\b0 \cf4 :\
+  - Test if the malloc error is resolved\
+  - If not, address:\
+    - Large static medical vocabulary\
+  data\
+    - Excessive debug logging during\
+  initialization\
+    - Implement LifecycleManageable\
+  protocol in managers\
+\
+  
+\f0\b \cf2 3. Debug Siri Integration (30 
+\f1\b0 \cf4 \
+  
+\f0\b \cf2 extract.actionsdata errors)
+\f1\b0 \cf4 \
+\
+  
+\f0\b \cf2 Status
+\f1\b0 \cf4 : \uc0\u10060  Not Fixed - We reverted all\
+  changes\
+  
+\f0\b \cf2 Why it failed
+\f1\b0 \cf4 : We don't understand the\
+  root cause\
+  
+\f0\b \cf2 Action needed
+\f1\b0 \cf4 :\
+  - First understand WHY the errors occur\
+  - Check if the project has an\
+  IntentDefinition file that we're\
+  missing\
+  - Verify the existing Siri integration\
+  setup\
+  - Don't blindly change iOS versions or\
+  add modifiers\
+\
+  
+\f0\b \cf2 4. Clean Up Debug Logging
+\f1\b0 \cf4 \
+\
+  
+\f0\b \cf2 Why
+\f1\b0 \cf4 : Contributing to memory pressure\
+  
+\f0\b \cf2 Action
+\f1\b0 \cf4 : Remove or conditionally compile\
+   debug print statements:\
+  \cf6 #if\cf4  \cf7 DEBUG\cf4 \
+  \cf8 print\cf4 (\cf9 "\uc0\u55357 \u56628  [INIT-ORDER] \cf4 \
+  \cf9 MedicationManagerApp.init() - START"\cf4 )\
+  \cf6 #endif\cf4 \
+\
+  
+\f0\b \cf2 5. Implement LifecycleManageable 
+\f1\b0 \cf4 \
+  
+\f0\b \cf2 Protocol
+\f1\b0 \cf4 \
+\
+  
+\f0\b \cf2 Status
+\f1\b0 \cf4 : Framework added but not\
+  implemented\
+  
+\f0\b \cf2 Why
+\f1\b0 \cf4 : To properly manage manager\
+  lifecycles\
+  
+\f0\b \cf2 Action
+\f1\b0 \cf4 : Add protocol conformance to:\
+  - DataSyncManager (stop/start periodic\
+  sync)\
+  - SpeechManager (release speech\
+  resources)\
+  - AnalyticsManager (flush pending\
+  events)\
+\
+  
+\f0\b \cf2 Priority Order:
+\f1\b0 \cf4 \
+\
+  1. 
+\f0\b \cf2 Fix DynamicShortcutsManager
+\f1\b0 \cf4  - App\
+  won't compile without this\
+  2. 
+\f0\b \cf2 Test memory fix
+\f1\b0 \cf4  - See if malloc\
+  error is resolved\
+  3. 
+\f0\b \cf2 Understand Siri setup
+\f1\b0 \cf4  - Before\
+  making any changes\
+  4. 
+\f0\b \cf2 Clean up logging
+\f1\b0 \cf4  - Quick win for\
+  memory\
+  5. 
+\f0\b \cf2 Implement lifecycle
+\f1\b0 \cf4  - Nice to have\
+  for resource management\
+\
+  The key lesson: We need to understand\
+  the existing codebase structure before\
+  making changes, especially for Siri\
+  integration.\
+}

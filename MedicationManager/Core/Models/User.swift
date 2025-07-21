@@ -1,11 +1,30 @@
 import Foundation
-import FirebaseFirestore
+@preconcurrency import FirebaseFirestore
 
-struct User: Codable, Identifiable {
+// MARK: - User Type
+enum UserType: String, Codable, CaseIterable, Sendable {
+    case primary = "primary"          // The subscriber who manages medications
+    case caregiver = "caregiver"      // Professional caregiver (via QR code)
+    case family = "family"            // Family member with view access (via QR code)
+    
+    var displayName: String {
+        switch self {
+        case .primary:
+            return "Primary Account"
+        case .caregiver:
+            return "Caregiver"
+        case .family:
+            return "Family Member"
+        }
+    }
+}
+
+struct User: Codable, Identifiable, Sendable {
     @DocumentID var id: String?
     let email: String
     let displayName: String
     let profileImageURL: String?
+    var userType: UserType = .primary  // NEW: Track user role
     var subscriptionStatus: SubscriptionStatus
     var subscriptionType: SubscriptionType?
     let trialEndDate: Date?
@@ -19,50 +38,51 @@ struct User: Codable, Identifiable {
     var mfaEnrolledAt: Date?
     var backupCodes: [String]?
     
-    enum SubscriptionStatus: String, Codable, CaseIterable {
+    enum SubscriptionStatus: String, Codable, CaseIterable, Sendable {
         case trial = "trial"
         case active = "active"
         case expired = "expired"
     }
     
-    enum SubscriptionType: String, Codable, CaseIterable {
+    enum SubscriptionType: String, Codable, CaseIterable, Sendable {
         case monthly = "monthly"
         case annual = "annual"
     }
 }
 
 // MARK: - User Preferences
-struct UserPreferences: Codable {
+struct UserPreferences: Codable, Sendable {
     var notificationsEnabled: Bool = true
     var voiceInputEnabled: Bool = true
+    var conflictAlertsEnabled: Bool = true  // NEW: Enable/disable medication conflict alerts
     var reminderFrequency: ReminderFrequency = .threeDaily
     var timeZone: String = TimeZone.current.identifier
     var language: String = "en"
 }
 
-enum ReminderFrequency: String, Codable, CaseIterable {
+enum ReminderFrequency: String, Codable, CaseIterable, Sendable {
     case threeDaily = "three_daily"   // Breakfast, lunch, dinner
     case custom = "custom"
 }
 
 // MARK: - Caregiver Access (Moving to separate file)
 extension User {
-    struct CaregiverAccess: Codable {
+    struct CaregiverAccess: Codable, Sendable {
         var enabled: Bool
         var caregivers: [CaregiverInfo]
         
-        struct CaregiverInfo: Codable, Identifiable {
+        struct CaregiverInfo: Codable, Identifiable, Sendable {
             let id: String
             let caregiverId: String
             let accessLevel: AccessLevel
             let grantedAt: Date
             var permissions: [Permission]
             
-            enum AccessLevel: String, Codable {
+            enum AccessLevel: String, Codable, Sendable {
                 case readonly = "readonly"
             }
             
-            enum Permission: String, Codable, CaseIterable {
+            enum Permission: String, Codable, CaseIterable, Sendable {
                 case myhealth = "myhealth"
                 case doctorlist = "doctorlist"
             }
@@ -98,7 +118,8 @@ extension User {
 // MARK: - Sample Data for Development
 #if DEBUG
 extension User {
-    static let sampleUser = User(
+    static var sampleUser: User {
+        User(
         id: "sample-user-id",
         email: "john.doe@example.com",
         displayName: "John Doe",
@@ -125,5 +146,6 @@ extension User {
         mfaEnrolledAt: nil,
         backupCodes: nil
     )
+    }
 }
 #endif

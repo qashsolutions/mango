@@ -1,12 +1,14 @@
 import Foundation
 import FirebaseAnalytics
+import Observation
 
 @MainActor
-class AnalyticsManager: ObservableObject {
+@Observable
+final class AnalyticsManager: AnalyticsManagerProtocol {
     static let shared = AnalyticsManager()
     
-    @Published var isEnabled: Bool = true
-    @Published var usageStats: UsageStats = UsageStats()
+    var isEnabled: Bool = true
+    var usageStats: UsageStats = UsageStats()
     
     private let userDefaults = UserDefaults.standard
     private let analyticsEnabledKey = "analytics_enabled"
@@ -37,6 +39,13 @@ class AnalyticsManager: ObservableObject {
     
     private func updateAnalyticsCollection() {
         Analytics.setAnalyticsCollectionEnabled(isEnabled)
+    }
+    
+    // MARK: - Generic Event Tracking
+    func trackEvent(_ eventName: String, parameters: [String: Any]? = nil) {
+        guard isEnabled else { return }
+        
+        Analytics.logEvent(eventName, parameters: parameters ?? [:])
     }
     
     // MARK: - User Events
@@ -75,6 +84,26 @@ class AnalyticsManager: ObservableObject {
         
         usageStats.incrementMedicationCount()
         if hasVoiceInput {
+            usageStats.incrementVoiceInputUsage()
+        }
+    }
+    
+    func trackMedicationAdded(viaVoice: Bool, medicationType: String? = nil) {
+        guard isEnabled else { return }
+        
+        var parameters: [String: Any] = [
+            "input_method": viaVoice ? "voice" : "text",
+            "voice_input_used": viaVoice
+        ]
+        
+        if let type = medicationType {
+            parameters["medication_type"] = type
+        }
+        
+        Analytics.logEvent("medication_added", parameters: parameters)
+        
+        usageStats.incrementMedicationCount()
+        if viaVoice {
             usageStats.incrementVoiceInputUsage()
         }
     }
@@ -228,6 +257,26 @@ class AnalyticsManager: ObservableObject {
         }
     }
     
+    func trackVoiceInputCompleted(duration: TimeInterval, wordCount: Int) {
+        guard isEnabled else { return }
+        
+        Analytics.logEvent("voice_input_detailed", parameters: [
+            "duration_seconds": Int(duration),
+            "word_count": wordCount,
+            "words_per_minute": Int(Double(wordCount) / (duration / 60.0))
+        ])
+    }
+    
+    func trackSiriIntent(_ intent: String) {
+        guard isEnabled else { return }
+        
+        Analytics.logEvent("siri_intent_used", parameters: [
+            "intent_type": intent
+        ])
+        
+        usageStats.incrementSiriUsage()
+    }
+    
     func trackVoiceInputError(context: String, errorType: String) {
         guard isEnabled else { return }
         
@@ -303,6 +352,69 @@ class AnalyticsManager: ObservableObject {
         }
     }
     
+    // MARK: - AI & Claude API Events
+    func trackConflictAnalysis(medicationCount: Int, supplementCount: Int, conflictsFound: Bool, cached: Bool) {
+        guard isEnabled else { return }
+        
+        Analytics.logEvent("conflict_analysis", parameters: [
+            "medication_count": medicationCount,
+            "supplement_count": supplementCount,
+            "conflicts_found": conflictsFound,
+            "from_cache": cached,
+            "total_items": medicationCount + supplementCount
+        ])
+        
+        if !cached {
+            usageStats.incrementConflictCheck()
+            if conflictsFound {
+                usageStats.incrementConflictsFound()
+            }
+        }
+    }
+    
+    func trackVoiceQuery(queryType: String, success: Bool) {
+        guard isEnabled else { return }
+        
+        Analytics.logEvent("voice_query", parameters: [
+            "query_type": queryType,
+            "success": success
+        ])
+        
+        if success {
+            usageStats.incrementVoiceInputUsage()
+        }
+    }
+    
+    func trackVoiceInput(context: String, duration: TimeInterval, wordCount: Int) {
+        guard isEnabled else { return }
+        
+        Analytics.logEvent("voice_input", parameters: [
+            "context": context,
+            "duration_seconds": Int(duration),
+            "word_count": wordCount
+        ])
+    }
+    
+    func trackAPIPerformance(endpoint: String, duration: TimeInterval, success: Bool) {
+        guard isEnabled else { return }
+        
+        Analytics.logEvent("api_performance", parameters: [
+            "endpoint": endpoint,
+            "duration_ms": Int(duration * 1000),
+            "success": success
+        ])
+    }
+    
+    func trackCaregiverInvited(method: String, permissionsGranted: [String]) {
+        guard isEnabled else { return }
+        
+        Analytics.logEvent("caregiver_invited", parameters: [
+            "invitation_method": method,
+            "permissions_count": permissionsGranted.count,
+            "permissions": permissionsGranted.joined(separator: ",")
+        ])
+    }
+    
     // MARK: - Error Events
     func trackError(_ error: AppError, context: String) {
         guard isEnabled else { return }
@@ -312,6 +424,57 @@ class AnalyticsManager: ObservableObject {
             "error_code": error.code,
             "context": context
         ])
+    }
+    
+    func trackError(_ error: Error, context: String) {
+        guard isEnabled else { return }
+        
+        // If it's an AppError, use the specialized method
+        if let appError = error as? AppError {
+            trackError(appError, context: context)
+        } else {
+            // Track generic errors
+            Analytics.logEvent("generic_error", parameters: [
+                "error_type": String(describing: type(of: error)),
+                "error_description": error.localizedDescription,
+                "context": context
+            ])
+        }
+    }
+    
+    func trackError(category: String, error: Error) {
+        guard isEnabled else { return }
+        
+        Analytics.logEvent("error_occurred", parameters: [
+            "category": category,
+            "error_description": error.localizedDescription
+        ])
+    }
+    
+    func trackIntentError(error: String, context: String) {
+        guard isEnabled else { return }
+        
+        Analytics.logEvent("intent_error", parameters: [
+            "error_type": error,
+            "context": context,
+            "platform": "siri"
+        ])
+    }
+    
+    func trackIntentPerformance(intent: String, duration: TimeInterval, success: Bool) {
+        guard isEnabled else { return }
+        
+        Analytics.logEvent("intent_performance", parameters: [
+            "intent_name": intent,
+            "duration_ms": Int(duration * 1000),
+            "success": success,
+            "platform": "app_intents"
+        ])
+        
+        // Also track as Siri usage for stats
+        if success {
+            usageStats.incrementSiriUsage()
+        }
     }
     
     // MARK: - Performance Events
@@ -454,6 +617,11 @@ struct UsageStats: Codable {
         lastUpdated = Date()
     }
     
+    mutating func incrementSiriUsage() {
+        featureUsage["siri_usage", default: 0] += 1
+        lastUpdated = Date()
+    }
+    
     // MARK: - Computed Properties
     var adherenceRate: Double {
         guard medicationsTaken > 0 else { return 0.0 }
@@ -492,6 +660,8 @@ extension AppError {
             return "data"
         case .voice:
             return "voice"
+        case .voiceInteraction:
+            return "voiceInteraction"
         case .sync:
             return "sync"
         case .caregiver:
@@ -500,6 +670,8 @@ extension AppError {
             return "caregiverAccess"
         case .subscription:
             return "subscription"
+        case .claudeAPI:
+            return "claudeAPI"
         }
     }
     
@@ -513,6 +685,8 @@ extension AppError {
             return "data_\(dataError)"
         case .voice(let voiceError):
             return "voice_\(voiceError)"
+        case .voiceInteraction(let voiceInteractionError):
+            return "voiceInteraction_\(voiceInteractionError)"
         case .sync(let syncError):
             return "sync_\(syncError)"
         case .caregiver(let caregiverError):
@@ -521,6 +695,8 @@ extension AppError {
             return "caregiverAccess_\(caregiverAccessError)"
         case .subscription(let subscriptionError):
             return "subscription_\(subscriptionError)"
+        case .claudeAPI(let claudeAPIError):
+            return "claude_\(claudeAPIError)"
         }
     }
 }

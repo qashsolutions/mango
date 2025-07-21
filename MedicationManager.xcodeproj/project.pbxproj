@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E44F14262DF574DE00DCB6B4 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E44F14252DF574DE00DCB6B4 /* FirebaseAuth */; };
-		E44F14282DF574E700DCB6B4 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = E44F14272DF574E700DCB6B4 /* FirebaseFirestore */; };
-		E44F142A2DF574F000DCB6B4 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = E44F14292DF574F000DCB6B4 /* FirebaseAnalytics */; };
-		E44F142C2DF574FF00DCB6B4 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = E44F142B2DF574FF00DCB6B4 /* FirebaseCrashlytics */; };
-		E44F142E2DF5750A00DCB6B4 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = E44F142D2DF5750A00DCB6B4 /* GoogleSignIn */; };
+		E46F5EE92DFE4E27002A30BA /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E46F5EE82DFE4E27002A30BA /* AppIntents.framework */; };
+		E46F633A2E00D627002A30BA /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = E46F63392E00D627002A30BA /* FirebaseMessaging */; };
+		E48109B72DFA4E3200763447 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = E48109B62DFA4E3200763447 /* FirebaseAnalytics */; };
+		E48109B92DFA4E5A00763447 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E48109B82DFA4E5A00763447 /* FirebaseAuth */; };
+		E48109BB2DFA4E6400763447 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = E48109BA2DFA4E6400763447 /* FirebaseFirestore */; };
+		E48109BD2DFA4E7600763447 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = E48109BC2DFA4E7600763447 /* FirebaseCrashlytics */; };
+		E48109BF2DFA4E7E00763447 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = E48109BE2DFA4E7E00763447 /* GoogleSignIn */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +37,7 @@
 		E44F13D02DF554B700DCB6B4 /* MedicationManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MedicationManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E44F13E22DF554B800DCB6B4 /* MedicationManagerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MedicationManagerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E44F13EC2DF554B800DCB6B4 /* MedicationManagerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MedicationManagerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E46F5EE82DFE4E27002A30BA /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = System/Library/Frameworks/AppIntents.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -73,11 +76,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E44F142E2DF5750A00DCB6B4 /* GoogleSignIn in Frameworks */,
-				E44F14262DF574DE00DCB6B4 /* FirebaseAuth in Frameworks */,
-				E44F142C2DF574FF00DCB6B4 /* FirebaseCrashlytics in Frameworks */,
-				E44F14282DF574E700DCB6B4 /* FirebaseFirestore in Frameworks */,
-				E44F142A2DF574F000DCB6B4 /* FirebaseAnalytics in Frameworks */,
+				E48109BF2DFA4E7E00763447 /* GoogleSignIn in Frameworks */,
+				E48109B72DFA4E3200763447 /* FirebaseAnalytics in Frameworks */,
+				E46F633A2E00D627002A30BA /* FirebaseMessaging in Frameworks */,
+				E46F5EE92DFE4E27002A30BA /* AppIntents.framework in Frameworks */,
+				E48109BD2DFA4E7600763447 /* FirebaseCrashlytics in Frameworks */,
+				E48109B92DFA4E5A00763447 /* FirebaseAuth in Frameworks */,
+				E48109BB2DFA4E6400763447 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -122,6 +127,7 @@
 		E44F14242DF574DE00DCB6B4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E46F5EE82DFE4E27002A30BA /* AppIntents.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -146,11 +152,12 @@
 			);
 			name = MedicationManager;
 			packageProductDependencies = (
-				E44F14252DF574DE00DCB6B4 /* FirebaseAuth */,
-				E44F14272DF574E700DCB6B4 /* FirebaseFirestore */,
-				E44F14292DF574F000DCB6B4 /* FirebaseAnalytics */,
-				E44F142B2DF574FF00DCB6B4 /* FirebaseCrashlytics */,
-				E44F142D2DF5750A00DCB6B4 /* GoogleSignIn */,
+				E48109B62DFA4E3200763447 /* FirebaseAnalytics */,
+				E48109B82DFA4E5A00763447 /* FirebaseAuth */,
+				E48109BA2DFA4E6400763447 /* FirebaseFirestore */,
+				E48109BC2DFA4E7600763447 /* FirebaseCrashlytics */,
+				E48109BE2DFA4E7E00763447 /* GoogleSignIn */,
+				E46F63392E00D627002A30BA /* FirebaseMessaging */,
 			);
 			productName = MedicationManager;
 			productReference = E44F13D02DF554B700DCB6B4 /* MedicationManager.app */;
@@ -235,8 +242,8 @@
 			mainGroup = E44F13C72DF554B700DCB6B4;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				E44F14222DF571CF00DCB6B4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				E44F14232DF5722F00DCB6B4 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				E48109B42DFA4C3400763447 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				E48109B52DFA4C4900763447 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E44F13D12DF554B700DCB6B4 /* Products */;
@@ -314,6 +321,8 @@
 /* Begin XCBuildConfiguration section */
 		E44F13F42DF554B800DCB6B4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = E44F13D22DF554B700DCB6B4 /* MedicationManager */;
+			baseConfigurationReferenceRelativePath = Resources/Configuration/Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -364,7 +373,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -372,11 +381,14 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
 		E44F13F52DF554B800DCB6B4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = E44F13D22DF554B700DCB6B4 /* MedicationManager */;
+			baseConfigurationReferenceRelativePath = Resources/Configuration/Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -421,27 +433,32 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
 		E44F13F72DF554B800DCB6B4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = E44F13D22DF554B700DCB6B4 /* MedicationManager */;
+			baseConfigurationReferenceRelativePath = Resources/Configuration/Secrets.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MedicationManager/MedicationManager.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X9DBV6C952;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MedicationManager/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Mango Health";
+				INFOPLIST_KEY_CFBundleDisplayName = MyGuide;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -460,22 +477,26 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
 		E44F13F82DF554B800DCB6B4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = E44F13D22DF554B700DCB6B4 /* MedicationManager */;
+			baseConfigurationReferenceRelativePath = Resources/Configuration/Secrets.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = MedicationManager/MedicationManager.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = X9DBV6C952;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MedicationManager/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Mango Health";
+				INFOPLIST_KEY_CFBundleDisplayName = MyGuide;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -495,13 +516,15 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
 		E44F13FA2DF554B800DCB6B4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = E44F13D22DF554B700DCB6B4 /* MedicationManager */;
+			baseConfigurationReferenceRelativePath = Resources/Configuration/Secrets.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -516,7 +539,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MedicationManager.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MedicationManager";
 			};
@@ -524,6 +547,8 @@
 		};
 		E44F13FB2DF554B800DCB6B4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = E44F13D22DF554B700DCB6B4 /* MedicationManager */;
+			baseConfigurationReferenceRelativePath = Resources/Configuration/Secrets.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -538,7 +563,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MedicationManager.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MedicationManager";
 			};
@@ -546,6 +571,8 @@
 		};
 		E44F13FD2DF554B800DCB6B4 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = E44F13D22DF554B700DCB6B4 /* MedicationManager */;
+			baseConfigurationReferenceRelativePath = Resources/Configuration/Secrets.xcconfig;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -558,7 +585,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_TARGET_NAME = MedicationManager;
 			};
@@ -566,6 +593,8 @@
 		};
 		E44F13FE2DF554B800DCB6B4 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = E44F13D22DF554B700DCB6B4 /* MedicationManager */;
+			baseConfigurationReferenceRelativePath = Resources/Configuration/Secrets.xcconfig;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -578,7 +607,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_TARGET_NAME = MedicationManager;
 			};
@@ -626,15 +655,15 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		E44F14222DF571CF00DCB6B4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+		E48109B42DFA4C3400763447 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 11.14.0;
 			};
 		};
-		E44F14232DF5722F00DCB6B4 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+		E48109B52DFA4C4900763447 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
 			requirement = {
@@ -645,29 +674,34 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E44F14252DF574DE00DCB6B4 /* FirebaseAuth */ = {
+		E46F63392E00D627002A30BA /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E44F14222DF571CF00DCB6B4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAuth;
+			package = E48109B42DFA4C3400763447 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
-		E44F14272DF574E700DCB6B4 /* FirebaseFirestore */ = {
+		E48109B62DFA4E3200763447 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E44F14222DF571CF00DCB6B4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFirestore;
-		};
-		E44F14292DF574F000DCB6B4 /* FirebaseAnalytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E44F14222DF571CF00DCB6B4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = E48109B42DFA4C3400763447 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
 		};
-		E44F142B2DF574FF00DCB6B4 /* FirebaseCrashlytics */ = {
+		E48109B82DFA4E5A00763447 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E44F14222DF571CF00DCB6B4 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = E48109B42DFA4C3400763447 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		E48109BA2DFA4E6400763447 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E48109B42DFA4C3400763447 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		E48109BC2DFA4E7600763447 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E48109B42DFA4C3400763447 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
 		};
-		E44F142D2DF5750A00DCB6B4 /* GoogleSignIn */ = {
+		E48109BE2DFA4E7E00763447 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E44F14232DF5722F00DCB6B4 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			package = E48109B52DFA4C4900763447 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignIn;
 		};
 /* End XCSwiftPackageProductDependency section */

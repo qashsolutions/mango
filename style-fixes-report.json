@@ -1,0 +1,13 @@
+{
+  "files_updated": 21,
+  "total_fixes": 94,
+  "fixes_by_type": {
+    "naming_conventions_fixed": 39,
+    "frame_fixed": 26,
+    "stack_spacing_fixed": 2,
+    "hardcoded_text_found": 24,
+    "offset_fixed": 1,
+    "unused_imports_removed": 1,
+    "opacity_fixed": 1
+  }
+}

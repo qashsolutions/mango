@@ -1,37 +1,87 @@
 import Foundation
 import Speech
 import AVFoundation
+import Observation
+import OSLog
 
+// MARK: - Task Storage
+/// Non-isolated storage for tasks that need to be cancelled in deinit
+private final class TaskStorage: @unchecked Sendable {
+    private var tasks: [Task<Void, Never>] = []
+    private let lock = NSLock()
+    
+    func add(_ task: Task<Void, Never>) {
+        lock.lock()
+        defer { lock.unlock() }
+        tasks.append(task)
+    }
+    
+    func remove(_ task: Task<Void, Never>) {
+        lock.lock()
+        defer { lock.unlock() }
+        tasks.removeAll { $0 == task }
+    }
+    
+    func cancelAll() {
+        lock.lock()
+        defer { lock.unlock() }
+        tasks.forEach { $0.cancel() }
+        tasks.removeAll()
+    }
+}
+
+// MARK: - Speech Manager (UI Layer)
+/// UI Layer responsible for managing speech recognition UI state and user interactions
+/// This class is @MainActor isolated for SwiftUI integration
 @MainActor
-class SpeechManager: NSObject, ObservableObject {
+@Observable
+final class SpeechManager: SpeechManagerProtocol {
     static let shared = SpeechManager()
     
-    @Published var isRecording: Bool = false
-    @Published var isAuthorized: Bool = false
-    @Published var recognizedText: String = ""
-    @Published var speechError: AppError?
-    @Published var isProcessing: Bool = false
+    // MARK: - Observable UI State
+    var isRecording: Bool = false
+    var isAuthorized: Bool = false
+    var recognizedText: String = ""
+    var speechError: AppError?
+    var isProcessing: Bool = false
     
-    private var audioEngine = AVAudioEngine()
-    private var speechRecognizer: SFSpeechRecognizer?
-    private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
-    private var recognitionTask: SFSpeechRecognitionTask?
+    // MARK: - Private Properties
+    private let recognitionActor: SpeechRecognitionActor
+    private let logger = Logger(subsystem: Configuration.App.bundleId, category: "SpeechManager")
     
-    private let audioSession = AVAudioSession.sharedInstance()
+    // Timer management for context-specific recognition
+    private var contextTimer: Task<Void, Never>?
     
-    private override init() {
-        super.init()
-        setupSpeechRecognizer()
+    // State observation task
+    private var stateObservationTask: Task<Void, Never>?
+    
+    // Task storage for cleanup in deinit (nonisolated)
+    private let taskStorage = TaskStorage()
+    
+    // MARK: - Initialization
+    private init() {
+        self.recognitionActor = SpeechRecognitionActor()
+        
         checkAuthorizationStatus()
+        startStateObservation()
+        
+        // Initialize the recognition actor
+        Task {
+            await recognitionActor.initialize()
+        }
+        
+        logger.info("SpeechManager initialized")
+    }
+    
+    deinit {
+        // Cancel tasks through nonisolated storage
+        taskStorage.cancelAll()
     }
     
     // MARK: - Setup
-    private func setupSpeechRecognizer() {
-        speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
-        speechRecognizer?.delegate = self
-    }
     
     private func checkAuthorizationStatus() {
+        // Check speech recognition authorization
         switch SFSpeechRecognizer.authorizationStatus() {
         case .authorized:
             isAuthorized = true
@@ -42,368 +92,197 @@ class SpeechManager: NSObject, ObservableObject {
         }
     }
     
-    // MARK: - Authorization
-    func requestSpeechAuthorization() async {
-        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-            SFSpeechRecognizer.requestAuthorization { [weak self] status in
-                DispatchQueue.main.async {
-                    switch status {
-                    case .authorized:
-                        self?.isAuthorized = true
-                    case .denied:
-                        self?.speechError = AppError.voice(.microphonePermissionDenied)
-                        self?.isAuthorized = false
-                    case .restricted:
-                        self?.speechError = AppError.voice(.speechRecognitionUnavailable)
-                        self?.isAuthorized = false
-                    case .notDetermined:
-                        self?.speechError = AppError.voice(.speechRecognitionUnavailable)
-                        self?.isAuthorized = false
-                    @unknown default:
-                        self?.speechError = AppError.voice(.speechRecognitionFailed)
-                        self?.isAuthorized = false
-                    }
-                    continuation.resume()
+    /// Start observing actor state changes
+    private func startStateObservation() {
+        let task = Task { [weak self] in
+            while !Task.isCancelled {
+                guard let self else { break }
+                
+                // Poll state every 100ms
+                try? await Task.sleep(for: .milliseconds(100))
+                
+                // Update UI based on actor state
+                let state = await self.recognitionActor.getCurrentState()
+                self.updateUIForState(state)
+                
+                // Update recognized text if available
+                if let result = await self.recognitionActor.currentResult {
+                    self.recognizedText = result.text
                 }
             }
         }
+        
+        stateObservationTask = task
+        taskStorage.add(task)
     }
     
-    private func requestMicrophoneAccess() async -> Bool {
-        await withCheckedContinuation { continuation in
-            audioSession.requestRecordPermission { granted in
-                continuation.resume(returning: granted)
+    /// Update UI state based on recognition state
+    private func updateUIForState(_ state: RecognitionState) {
+        switch state {
+        case .idle:
+            isRecording = false
+            isProcessing = false
+            speechError = nil
+            
+        case .requestingPermissions:
+            isProcessing = true
+            
+        case .permissionsGranted:
+            isAuthorized = true
+            isProcessing = false
+            
+        case .permissionsDenied(let reason):
+            isAuthorized = false
+            isProcessing = false
+            
+            switch reason {
+            case .microphone, .both:
+                speechError = AppError.voice(.microphonePermissionDenied)
+            case .speechRecognition:
+                speechError = AppError.voice(.speechRecognitionUnavailable)
             }
+            
+        case .preparing:
+            isProcessing = true
+            
+        case .recording:
+            isRecording = true
+            isProcessing = false
+            
+        case .processing:
+            isProcessing = true
+            
+        case .stopped:
+            isRecording = false
+            isProcessing = false
+            
+        case .error(let error):
+            isRecording = false
+            isProcessing = false
+            speechError = error
         }
     }
     
-    // MARK: - Recording Control
+    // MARK: - Public Interface
+    
+    /// Request speech authorization
+    func requestSpeechAuthorization() async {
+        logger.debug("Requesting speech authorization")
+        _ = await recognitionActor.requestPermissions()
+    }
+    
+    /// Start recording
     func startRecording() async throws {
-        guard isAuthorized else {
-            throw AppError.voice(.microphonePermissionDenied)
+        logger.debug("Start recording requested from UI")
+        
+        clearError()
+        recognizedText = ""
+        
+        do {
+            try await recognitionActor.startRecording()
+        } catch {
+            logger.error("Failed to start recording: \(error)")
+            throw error
+        }
+    }
+    
+    /// Stop recording
+    func stopRecording() {
+        logger.debug("Stop recording requested from UI")
+        
+        Task {
+            await recognitionActor.stopRecording()
+        }
+    }
+    
+    /// Reset speech recognition
+    func resetSpeechRecognition() {
+        logger.debug("Reset requested from UI")
+        
+        Task {
+            await recognitionActor.reset()
         }
         
-        guard !isRecording else {
-            return
-        }
-        
-        let microphoneGranted = await requestMicrophoneAccess()
-        guard microphoneGranted else {
-            throw AppError.voice(.microphonePermissionDenied)
-        }
-        
-        try await setupAudioSession()
-        try await startSpeechRecognition()
-        
-        isRecording = true
         recognizedText = ""
         speechError = nil
-    }
-    
-    func stopRecording() {
-        guard isRecording else { return }
-        
-        audioEngine.stop()
-        recognitionRequest?.endAudio()
-        
+        isProcessing = false
         isRecording = false
     }
     
-    private func setupAudioSession() async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            do {
-                try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
-                try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-                continuation.resume()
-            } catch {
-                continuation.resume(throwing: AppError.voice(.audioSessionError))
-            }
-        }
-    }
-    
-    private func startSpeechRecognition() async throws {
-        // Cancel any previous task
-        recognitionTask?.cancel()
-        recognitionTask = nil
-        
-        // Create recognition request
-        recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
-        guard let recognitionRequest = recognitionRequest else {
-            throw AppError.voice(.speechRecognitionFailed)
-        }
-        
-        recognitionRequest.shouldReportPartialResults = true
-        
-        // Setup audio input
-        let inputNode = audioEngine.inputNode
-        let recordingFormat = inputNode.outputFormat(forBus: 0)
-        
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { buffer, _ in
-            recognitionRequest.append(buffer)
-        }
-        
-        audioEngine.prepare()
-        try audioEngine.start()
-        
-        // Start recognition
-        recognitionTask = speechRecognizer?.recognitionTask(with: recognitionRequest) { [weak self] result, error in
-            DispatchQueue.main.async {
-                if let result = result {
-                    self?.recognizedText = result.bestTranscription.formattedString
-                    self?.processRecognizedText(result.bestTranscription.formattedString, isFinal: result.isFinal)
-                }
-                
-                if let error = error {
-                    self?.speechError = AppError.voice(.speechRecognitionFailed)
-                    self?.stopRecording()
-                }
-            }
-        }
-    }
-    
-    // MARK: - Text Processing
-    private func processRecognizedText(_ text: String, isFinal: Bool) {
-        guard isFinal else { return }
-        
-        isProcessing = true
-        
-        Task {
-            let processedText = await enhanceTextForMedicalContext(text)
-            
-            await MainActor.run {
-                self.recognizedText = processedText
-                self.isProcessing = false
-            }
-        }
-    }
-    
-    private func enhanceTextForMedicalContext(_ text: String) async -> String {
-        var enhancedText = text.lowercased()
-        
-        // Common medication name corrections
-        let medicationCorrections: [String: String] = [
-            "advil": "Advil",
-            "tylenol": "Tylenol",
-            "aspirin": "Aspirin",
-            "ibuprofen": "Ibuprofen",
-            "acetaminophen": "Acetaminophen",
-            "lisinopril": "Lisinopril",
-            "metformin": "Metformin",
-            "atorvastatin": "Atorvastatin",
-            "amlodipine": "Amlodipine",
-            "omeprazole": "Omeprazole",
-            "levothyroxine": "Levothyroxine",
-            "albuterol": "Albuterol",
-            "prednisone": "Prednisone",
-            "warfarin": "Warfarin",
-            "insulin": "Insulin"
-        ]
-        
-        // Dosage corrections
-        let dosageCorrections: [String: String] = [
-            "milligrams": "mg",
-            "milligram": "mg",
-            "grams": "g",
-            "gram": "g",
-            "milliliters": "ml",
-            "milliliter": "ml",
-            "tablets": "tablets",
-            "tablet": "tablet",
-            "capsules": "capsules",
-            "capsule": "capsule",
-            "teaspoons": "tsp",
-            "teaspoon": "tsp",
-            "tablespoons": "tbsp",
-            "tablespoon": "tbsp"
-        ]
-        
-        // Frequency corrections
-        let frequencyCorrections: [String: String] = [
-            "once a day": "once daily",
-            "twice a day": "twice daily",
-            "three times a day": "three times daily",
-            "four times a day": "four times daily",
-            "every day": "daily",
-            "every morning": "every morning",
-            "every evening": "every evening",
-            "every night": "every night",
-            "before meals": "before meals",
-            "after meals": "after meals",
-            "with food": "with food",
-            "on empty stomach": "on empty stomach"
-        ]
-        
-        // Apply corrections
-        for (incorrect, correct) in medicationCorrections {
-            enhancedText = enhancedText.replacingOccurrences(of: incorrect, with: correct)
-        }
-        
-        for (incorrect, correct) in dosageCorrections {
-            enhancedText = enhancedText.replacingOccurrences(of: incorrect, with: correct)
-        }
-        
-        for (incorrect, correct) in frequencyCorrections {
-            enhancedText = enhancedText.replacingOccurrences(of: incorrect, with: correct)
-        }
-        
-        // Capitalize first letter of sentences
-        enhancedText = enhancedText.capitalizingFirstLetter()
-        
-        return enhancedText
-    }
-    
-    // MARK: - Specialized Voice Input
-    func recognizeMedicationName() async throws -> String {
-        try await startRecording()
-        
-        return await withCheckedContinuation { continuation in
-            // Wait for final result or timeout
-            Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
-                self.stopRecording()
-                continuation.resume(returning: self.recognizedText)
-            }
-        }
-    }
-    
-    func recognizeDosage() async throws -> String {
-        try await startRecording()
-        
-        return await withCheckedContinuation { continuation in
-            Timer.scheduledTimer(withTimeInterval: 3.0, repeats: false) { _ in
-                self.stopRecording()
-                let dosage = self.extractDosageFromText(self.recognizedText)
-                continuation.resume(returning: dosage)
-            }
-        }
-    }
-    
-    func recognizeFrequency() async throws -> String {
-        try await startRecording()
-        
-        return await withCheckedContinuation { continuation in
-            Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { _ in
-                self.stopRecording()
-                let frequency = self.extractFrequencyFromText(self.recognizedText)
-                continuation.resume(returning: frequency)
-            }
-        }
-    }
-    
-    // MARK: - Text Extraction Helpers
-    private func extractDosageFromText(_ text: String) -> String {
-        let dosagePatterns = [
-            #"\d+\s*(mg|milligrams?|g|grams?|ml|milliliters?|tablets?|capsules?|tsp|teaspoons?|tbsp|tablespoons?)"#,
-            #"\d+/\d+\s*(mg|g|ml|tablets?|capsules?)"#,
-            #"(one|two|three|four|five|six|seven|eight|nine|ten)\s*(mg|milligrams?|g|grams?|ml|milliliters?|tablets?|capsules?|tsp|teaspoons?|tbsp|tablespoons?)"#
-        ]
-        
-        for pattern in dosagePatterns {
-            if let match = text.range(of: pattern, options: .regularExpression) {
-                return String(text[match])
-            }
-        }
-        
-        return text
-    }
-    
-    private func extractFrequencyFromText(_ text: String) -> String {
-        let frequencyKeywords = [
-            "once daily", "twice daily", "three times daily", "four times daily",
-            "every morning", "every evening", "every night",
-            "before meals", "after meals", "with food", "on empty stomach",
-            "as needed", "when necessary"
-        ]
-        
-        for keyword in frequencyKeywords {
-            if text.lowercased().contains(keyword) {
-                return keyword
-            }
-        }
-        
-        return text
-    }
-    
-    // MARK: - Error Handling
+    /// Clear error state
     func clearError() {
         speechError = nil
     }
     
-    func resetSpeechRecognition() {
-        stopRecording()
-        recognizedText = ""
-        speechError = nil
-        isProcessing = false
-    }
-}
-
-// MARK: - Speech Recognizer Delegate
-extension SpeechManager: SFSpeechRecognizerDelegate {
-    func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
-        if !available {
-            speechError = AppError.voice(.speechRecognitionUnavailable)
-            stopRecording()
-        }
-    }
-}
-
-// MARK: - String Extensions
-extension String {
-    func capitalizingFirstLetter() -> String {
-        return prefix(1).capitalized + dropFirst()
-    }
-}
-
-// MARK: - Voice Input Context
-enum VoiceInputContext {
-    case medicationName
-    case dosage
-    case frequency
-    case notes
-    case doctorName
-    case doctorSpecialty
-    case foodName
-    case general
+    // MARK: - Specialized Voice Input
     
-    var promptText: String {
-        switch self {
-        case .medicationName:
-            return "Say the medication name"
-        case .dosage:
-            return "Say the dosage amount"
-        case .frequency:
-            return "Say how often to take"
-        case .notes:
-            return "Add any notes"
-        case .doctorName:
-            return "Say the doctor's name"
-        case .doctorSpecialty:
-            return "Say the specialty"
-        case .foodName:
-            return "Say the food name"
-        case .general:
-            return "Start speaking"
-        }
+    /// Recognize medication name with timeout
+    func recognizeMedicationName() async throws -> String {
+        logger.debug("Recognizing medication name")
+        
+        try await startRecordingWithContext(.medicationName, timeout: .seconds(5))
+        return recognizedText
     }
     
-    var maxDuration: TimeInterval {
-        switch self {
-        case .medicationName, .doctorName, .foodName:
-            return 3.0
-        case .dosage:
-            return 2.0
-        case .frequency:
-            return 5.0
-        case .notes:
-            return 10.0
-        case .doctorSpecialty:
-            return 3.0
-        case .general:
-            return 8.0
+    /// Recognize dosage with timeout
+    func recognizeDosage() async throws -> String {
+        logger.debug("Recognizing dosage")
+        
+        try await startRecordingWithContext(.dosage, timeout: .seconds(3))
+        return recognizedText
+    }
+    
+    /// Recognize frequency with timeout
+    func recognizeFrequency() async throws -> String {
+        logger.debug("Recognizing frequency")
+        
+        try await startRecordingWithContext(.frequency, timeout: .seconds(5))
+        return recognizedText
+    }
+    
+    // MARK: - Private Methods
+    
+    /// Start recording with specific context and timeout
+    private func startRecordingWithContext(_ context: VoiceInteractionContext, timeout: Duration) async throws {
+        // Cancel any existing timer
+        if let existingTimer = contextTimer {
+            existingTimer.cancel()
+            taskStorage.remove(existingTimer)
         }
+        
+        // Start recording
+        try await recognitionActor.startRecording(context: context)
+        
+        // Start timeout timer
+        let timerTask = Task { [weak self] in
+            do {
+                try await Task.sleep(for: timeout)
+                
+                // Stop recording after timeout
+                self?.stopRecording()
+                
+                // Process the result for context
+                if let self = self {
+                    let text = self.recognizedText
+                    if !text.isEmpty {
+                        let processedText = await self.recognitionActor.processTextForContext(text, context: context)
+                        self.recognizedText = processedText
+                    }
+                }
+            } catch {
+                // Task cancelled
+            }
+        }
+        
+        contextTimer = timerTask
+        taskStorage.add(timerTask)
+        
+        // Wait for the timer to complete
+        _ = await timerTask.value
     }
 }
 
-// MARK: - Sample Data for Development
+// MARK: - Development Support
 #if DEBUG
 extension SpeechManager {
     static let mockSpeechManager: SpeechManager = {

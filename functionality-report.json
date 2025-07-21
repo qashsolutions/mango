@@ -1,0 +1,846 @@
+{
+  "timestamp": "2025-06-14T01:52:36.625344",
+  "total_files_checked": 61,
+  "total_issues": 193,
+  "results": {
+    "syntax_errors": [
+      {
+        "file": "MedicationManager/Core/Configuration/CommonStrings.swift",
+        "error": "MedicationManager/Core/Configuration/CommonStrings.swift:14:20: error: keyword 'continue' cannot be used as an identifier here\n 12 |         static let close = NSLocalizedString(\"common.close\", value: \"Close\", comment: \"Close\")\n 13 |         static let confirm = NSLocalizedString(\"common.confirm\", value: \"Confirm\", comment: \"Confirm\")\n 14 |         static let continue = NSLocalizedString(\"common.continue\", value: \"Continue\", comment: \"Continue\")\n    |                    |- error: keyword 'continue' cannot be used as an identifier here\n    |                    `- note: if this name is unavoidable, use backticks to escape it\n 15 |         static let daily = NSLocalizedString(\"common.daily\", value: \"Daily\", comment: \"Daily\")\n 16 |         static let delete = NSLocalizedString(\"common.delete\", value: \"Delete\", comment: \"Delete\")\n"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/VoiceInteractionManager.swift",
+        "error": "MedicationManager/Core/Managers/VoiceInteractionManager.swift:427:56: error: expected ',' separator\n425 |         let channelDataArray = Array(UnsafeBufferPointer(start: channelDataValue, count: Int(buffer.frameLength)))\n426 |         \n427 |         let rms = sqrt(channelDataArray.map { $0 * $0 }AppTheme.Colors.erroruce(0, +) / Float(buffer.frameLength))\n    |                                                        `- error: expected ',' separator\n428 |         let avgPower = 20 * log10(rms)\n429 |         \n"
+      },
+      {
+        "file": "MedicationManager/Core/Models/DietEntry.swift",
+        "error": "MedicationManager/Core/Models/DietEntry.swift:96:41: error: consecutive statements on a line must be separated by ';'\n 94 | extension DietEntryModel {\n 95 |     var totalCalories: Int {\n 96 |         foods.compactMap { $0.calories }AppTheme.Colors.erroruce(0, +)\n    |                                         `- error: consecutive statements on a line must be separated by ';'\n 97 |     }\n 98 |     \n"
+      },
+      {
+        "file": "MedicationManager/Intents/MedicationIntents.swift",
+        "error": "MedicationManager/Intents/MedicationIntents.swift:339:5: error: enum 'case' is not allowed outside of an enum\n337 |     ]\n338 |     \n339 |     case daily\n    |     `- error: enum 'case' is not allowed outside of an enum\n340 |     case twiceDaily\n341 |     case threeTimesDaily\n\nMedicationManager/Intents/MedicationIntents.swift:340:5: error: enum 'case' is not allowed outside of an enum\n338 |     \n339 |     case daily\n340 |     case twiceDaily\n    |     `- error: enum 'case' is not allowed outside of an enum\n341 |     case threeTimesDaily\n342 |     case fourTimesDaily\n\nMedicationManager/Intents/MedicationIntents.swift:341:5: error: enum 'case' is not allowed outside of an enum\n339 |     case daily\n340 |     case twiceDaily\n341 |     case threeTimesDaily\n    |     `- error: enum 'case' is not allowed outside of an enum\n342 |     case fourTimesDaily\n343 |     case weekly\n\nMedicationManager/Intents/MedicationIntents.swift:342:5: error: enum 'case' is not allowed outside of an enum\n340 |     case twiceDaily\n341 |     case threeTimesDaily\n342 |     case fourTimesDaily\n    |     `- error: enum 'case' is not allowed outside of an enum\n343 |     case weekly\n344 |     case asNeeded\n\nMedicationManager/Intents/MedicationIntents.swift:343:5: error: enum 'case' is not allowed outside of an enum\n341 |     case threeTimesDaily\n342 |     case fourTimesDaily\n343 |     case weekly\n    |     `- error: enum 'case' is not allowed outside of an enum\n344 |     case asNeeded\n345 |     \n\nMedicationManager/Intents/MedicationIntents.swift:344:5: error: enum 'case' is not allowed outside of an enum\n342 |     case fourTimesDaily\n343 |     case weekly\n344 |     case asNeeded\n    |     `- error: enum 'case' is not allowed outside of an enum\n345 |     \n346 |     func toFrequency() -> MedicationFrequency {\n"
+      }
+    ],
+    "import_errors": [
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+        "missing": "Observation"
+      },
+      {
+        "file": "MedicationManager/Intents/MedicationIntents.swift",
+        "missing": "SwiftUI"
+      }
+    ],
+    "undefined_references": [
+      {
+        "file": "MedicationManager/App/MedicationManagerApp.swift",
+        "import": "UserNotifications"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "import": "IntentsUI"
+      },
+      {
+        "file": "MedicationManager/Core/Networking/FirebaseManager.swift",
+        "import": "GoogleSignIn"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/DataSyncManager.swift",
+        "import": "Network"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+        "import": "NaturalLanguage"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/MFASetupView.swift",
+        "import": "CoreImage.CIFilterBuiltins"
+      }
+    ],
+    "unused_imports": [
+      {
+        "file": "MedicationManager/App/MedicationManagerApp.swift",
+        "import": "FirebaseAuth"
+      },
+      {
+        "file": "MedicationManager/App/MedicationManagerApp.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/App/MedicationManagerApp.swift",
+        "import": "UserNotifications"
+      },
+      {
+        "file": "MedicationManager/Core/Components/VoiceFirstInputView.swift",
+        "import": "AVFoundation"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/ConflictDetectionManager.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/ConflictDetectionManager.swift",
+        "import": "CoreData"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "import": "IntentsUI"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/VoiceInteractionManager.swift",
+        "import": "AVFoundation"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/VoiceInteractionManager.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Core/Models/BaseModel.swift",
+        "import": "FirebaseFirestore"
+      },
+      {
+        "file": "MedicationManager/Core/Models/CaregiverAccess.swift",
+        "import": "FirebaseFirestore"
+      },
+      {
+        "file": "MedicationManager/Core/Models/DietEntry.swift",
+        "import": "FirebaseFirestore"
+      },
+      {
+        "file": "MedicationManager/Core/Models/Doctor.swift",
+        "import": "FirebaseFirestore"
+      },
+      {
+        "file": "MedicationManager/Core/Models/Medication.swift",
+        "import": "FirebaseFirestore"
+      },
+      {
+        "file": "MedicationManager/Core/Models/MedicationConflict.swift",
+        "import": "FirebaseFirestore"
+      },
+      {
+        "file": "MedicationManager/Core/Models/Supplement.swift",
+        "import": "FirebaseFirestore"
+      },
+      {
+        "file": "MedicationManager/Core/Models/User.swift",
+        "import": "FirebaseFirestore"
+      },
+      {
+        "file": "MedicationManager/Core/Navigation/FullScreenCoverView.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Core/Navigation/FullScreenCoverView.swift",
+        "import": "FirebaseAuth"
+      },
+      {
+        "file": "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Core/Networking/FirebaseManager.swift",
+        "import": "FirebaseFirestore"
+      },
+      {
+        "file": "MedicationManager/Core/Networking/FirebaseManager.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Core/Persistence.swift",
+        "import": "CoreData"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/AccessControl.swift",
+        "import": "FirebaseFirestore"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+        "import": "FirebaseAnalytics"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/CoreDataManager.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/DataSyncManager.swift",
+        "import": "FirebaseFirestore"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/KeychainManager.swift",
+        "import": "Security"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+        "import": "NaturalLanguage"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/SpeechManager.swift",
+        "import": "AVFoundation"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/AuthenticationView.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/LoginView.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/MFASetupView.swift",
+        "import": "CoreImage.CIFilterBuiltins"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/MFASetupView.swift",
+        "import": "FirebaseAuth"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/MFASignInView.swift",
+        "import": "FirebaseAuth"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/PhoneAuthView.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Features/DoctorList/DoctorListViewModel.swift",
+        "import": "MessageUI"
+      },
+      {
+        "file": "MedicationManager/Features/DoctorList/DoctorListViewModel.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Features/MyHealth/MyHealthViewModel.swift",
+        "import": "OSLog"
+      },
+      {
+        "file": "MedicationManager/Intents/MedicationIntents.swift",
+        "import": "Intents"
+      },
+      {
+        "file": "MedicationManager/Intents/MedicationIntents.swift",
+        "import": "AppIntents"
+      }
+    ],
+    "missing_dependencies": [],
+    "circular_dependencies": [],
+    "protocol_conformance": [
+      {
+        "file": "MedicationManager/Core/Configuration/AppStrings.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Configuration/AppStrings.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Configuration/AppStrings.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Configuration/AppStrings.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Configuration/AppStrings.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Configuration/AppStrings.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Configuration/AppStrings.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Networking/FirebaseManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Networking/FirebaseManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Networking/FirebaseManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Networking/FirebaseManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/CoreDataManager.swift",
+        "issue": "ObservableObject typically needs @Published properties"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/DoctorList/DoctorListViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/DoctorList/DoctorListViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/DoctorList/DoctorListViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/DoctorList/DoctorListViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/Groups/GroupsViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/Groups/GroupsViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/Groups/GroupsViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/MyHealth/MyHealthViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/MyHealth/MyHealthViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/MyHealth/MyHealthViewModel.swift",
+        "issue": "View protocol requires body property"
+      },
+      {
+        "file": "MedicationManager/Features/MyHealth/MyHealthViewModel.swift",
+        "issue": "View protocol requires body property"
+      }
+    ],
+    "type_mismatches": [],
+    "async_issues": [
+      {
+        "file": "MedicationManager/Core/Components/ConflictSeverityBadge.swift",
+        "issue": "Async function without proper await usage"
+      },
+      {
+        "file": "MedicationManager/Core/Components/VoiceCommandButton.swift",
+        "issue": "Async function without proper await usage"
+      },
+      {
+        "file": "MedicationManager/Core/Navigation/FullScreenCoverView.swift",
+        "issue": "Async function without proper await usage"
+      }
+    ],
+    "optional_handling": [
+      {
+        "file": "MedicationManager/App/MedicationManagerApp.swift",
+        "count": 2,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Components/AIAnalysisCard.swift",
+        "count": 2,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Components/ActionButton.swift",
+        "count": 1,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Components/MedicationCard.swift",
+        "count": 14,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Components/SyncStatusView.swift",
+        "count": 1,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Components/VoiceCommandButton.swift",
+        "count": 3,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Components/VoiceFirstInputView.swift",
+        "count": 9,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Components/VoiceInputButton.swift",
+        "count": 16,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Configuration/AppStrings.swift",
+        "count": 1,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/ConflictDetectionManager.swift",
+        "count": 5,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/SiriIntentsManager.swift",
+        "count": 2,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Managers/VoiceInteractionManager.swift",
+        "count": 6,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Models/CaregiverAccess.swift",
+        "count": 3,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Models/DietEntry.swift",
+        "count": 1,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Models/Doctor.swift",
+        "count": 11,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Models/Medication.swift",
+        "count": 3,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Models/MedicationConflict.swift",
+        "count": 3,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Models/Supplement.swift",
+        "count": 3,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Navigation/NavigationManager.swift",
+        "count": 2,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Networking/ClaudeAIClient.swift",
+        "count": 1,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Networking/FirebaseManager.swift",
+        "count": 4,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Persistence.swift",
+        "count": 1,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Testing/SyncTestRunner.swift",
+        "count": 3,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Testing/TestingView.swift",
+        "count": 2,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/AccessControl.swift",
+        "count": 1,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/AnalyticsManager.swift",
+        "count": 1,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/CoreDataManager.swift",
+        "count": 2,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/DataSyncManager.swift",
+        "count": 3,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/KeychainManager.swift",
+        "count": 2,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/MedicalVocabularyHelper.swift",
+        "count": 5,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Core/Utilities/SpeechManager.swift",
+        "count": 2,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/AuthenticationView.swift",
+        "count": 2,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/MFASignInView.swift",
+        "count": 1,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/PhoneAuthView.swift",
+        "count": 4,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+        "count": 3,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictHistoryView.swift",
+        "count": 1,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsView.swift",
+        "count": 8,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+        "count": 10,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/VoiceQueryView.swift",
+        "count": 3,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/DoctorList/DoctorListView.swift",
+        "count": 6,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/DoctorList/DoctorListViewModel.swift",
+        "count": 14,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/Groups/GroupsView.swift",
+        "count": 2,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/Groups/GroupsViewModel.swift",
+        "count": 4,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/MyHealth/MyHealthView.swift",
+        "count": 3,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Features/MyHealth/MyHealthViewModel.swift",
+        "count": 9,
+        "issue": "Force unwrapping detected"
+      },
+      {
+        "file": "MedicationManager/Intents/MedicationIntents.swift",
+        "count": 1,
+        "issue": "Force unwrapping detected"
+      }
+    ],
+    "api_consistency": [],
+    "naming_violations": [
+      {
+        "file": "MedicationManager/Core/Components/AIAnalysisCard.swift",
+        "issue": "Function CardHeader should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/AIAnalysisCard.swift",
+        "issue": "Function CollapsedContent should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/AIAnalysisCard.swift",
+        "issue": "Function ExpandedContent should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/AIAnalysisCard.swift",
+        "issue": "Function ConflictsList should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/AIAnalysisCard.swift",
+        "issue": "Function RecommendationsList should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/AIAnalysisCard.swift",
+        "issue": "Function CardActions should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/ConflictSeverityBadge.swift",
+        "issue": "Function CompactIndicator should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/ConflictSeverityBadge.swift",
+        "issue": "Function FullIndicator should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/MedicationCard.swift",
+        "issue": "Function StatusIndicator should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/MedicationCard.swift",
+        "issue": "Function MenuButton should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/MedicationCard.swift",
+        "issue": "Function ScheduleRow should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/MedicationCard.swift",
+        "issue": "Function ActionButtons should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/MedicationCard.swift",
+        "issue": "Function NextDoseInfo should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/MedicationCard.swift",
+        "issue": "Function NotesSection should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/MedicationCard.swift",
+        "issue": "Function ContextMenuContent should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/VoiceFirstInputView.swift",
+        "issue": "Function VoiceInputView should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/VoiceFirstInputView.swift",
+        "issue": "Function TextInputView should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Components/VoiceFirstInputView.swift",
+        "issue": "Function TranscriptionDisplay should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Navigation/MainTabView.swift",
+        "issue": "Function MyHealthTabView should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Navigation/MainTabView.swift",
+        "issue": "Function DoctorListTabView should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Navigation/MainTabView.swift",
+        "issue": "Function GroupsTabView should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Navigation/MainTabView.swift",
+        "issue": "Function ConflictsTabView should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Core/Networking/FirebaseManager.swift",
+        "issue": "Type handles should be PascalCase"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/LoginView.swift",
+        "issue": "Type brandingSection should be PascalCase"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/LoginView.swift",
+        "issue": "Type instance should be PascalCase"
+      },
+      {
+        "file": "MedicationManager/Features/Authentication/LoginView.swift",
+        "issue": "Type instance should be PascalCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+        "issue": "Function AnalysisHeaderCard should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+        "issue": "Function SummaryContent should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+        "issue": "Function ConflictsContent should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+        "issue": "Function RecommendationsContent should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+        "issue": "Function ActionsSection should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictAnalysisView.swift",
+        "issue": "Function AnalysisFooter should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictHistoryView.swift",
+        "issue": "Function SearchAndFiltersSection should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictHistoryView.swift",
+        "issue": "Function HistoryList should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictHistoryView.swift",
+        "issue": "Function EmptyHistoryView should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsView.swift",
+        "issue": "Function LoadingView should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsView.swift",
+        "issue": "Function AnalyzingView should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsView.swift",
+        "issue": "Function MainContentView should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsView.swift",
+        "issue": "Function EmptyStateView should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+        "issue": "Type for should be PascalCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/ConflictsViewModel.swift",
+        "issue": "Type for should be PascalCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/VoiceQueryView.swift",
+        "issue": "Function VoiceInputSection should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/VoiceQueryView.swift",
+        "issue": "Function ExamplesSection should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/VoiceQueryView.swift",
+        "issue": "Function QueryPreviewSection should be camelCase"
+      },
+      {
+        "file": "MedicationManager/Features/Conflicts/VoiceQueryView.swift",
+        "issue": "Function ActionButtons should be camelCase"
+      }
+    ],
+    "architecture_violations": []
+  }
+}

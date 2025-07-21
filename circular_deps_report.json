@@ -1,0 +1,432 @@
+{
+  "circular_dependencies": [],
+  "longer_cycles": [],
+  "dependency_graph": {
+    "SwiftDataConfiguration": [
+      "UserProfile"
+    ],
+    "Configuration": [
+      "AppTheme"
+    ],
+    "FirebaseManager": [
+      "User",
+      "AppError",
+      "AppStrings"
+    ],
+    "ConflictDetectionManager": [
+      "Configuration",
+      "ClaudeAIClient",
+      "AnalyticsManager"
+    ],
+    "UserModeManager": [
+      "AnalyticsManager",
+      "FirebaseManager",
+      "CaregiverTask"
+    ],
+    "ExportManager": [
+      "CoreDataManager",
+      "FirebaseManager",
+      "AppStrings"
+    ],
+    "SiriIntentsManager": [
+      "ConflictDetectionManager",
+      "AnalyticsManager",
+      "FirebaseManager"
+    ],
+    "NotificationManager": [
+      "AppError"
+    ],
+    "MedicationReminderManager": [
+      "CoreDataManager",
+      "NotificationManager",
+      "FirebaseManager"
+    ],
+    "VoiceInteractionManager": [
+      "Configuration",
+      "AppError",
+      "VoiceInteractionContext",
+      "AnalyticsManager"
+    ],
+    "CaregiverTaskManager": [
+      "CoreDataManager",
+      "AnalyticsManager",
+      "FirebaseManager",
+      "CaregiverTask",
+      "NotificationManager"
+    ],
+    "MainTabView": [
+      "FirebaseManager",
+      "NavigationManager",
+      "DataSyncManager",
+      "ViewFactoryProtocol"
+    ],
+    "FullScreenCoverView": [
+      "FirebaseManager",
+      "ViewFactoryProtocol"
+    ],
+    "NavigationManager": [
+      "AppError",
+      "VoiceInteractionContext"
+    ],
+    "MainTabViewWrapper": [
+      "FirebaseManager",
+      "ViewFactoryProtocol"
+    ],
+    "MedicationConflict": [
+      "ClaudeAIClient"
+    ],
+    "Doctor": [
+      "Configuration"
+    ],
+    "ConflictEntity+Extension": [
+      "MedicationConflict"
+    ],
+    "UserProfile": [
+      "User"
+    ],
+    "User": [
+      "CaregiverAccess"
+    ],
+    "View+SwiftData": [
+      "SwiftDataConfiguration"
+    ],
+    "Calendar+Extensions": [
+      "AppError"
+    ],
+    "ViewFactory+Environment": [
+      "ViewFactoryProtocol"
+    ],
+    "CoreDataManager": [
+      "MedicationConflict",
+      "UserModeManager",
+      "FirebaseManager"
+    ],
+    "CoreDataManager+SyncDataProvider": [
+      "CoreDataManager"
+    ],
+    "MedicalVocabularyHelper": [
+      "VoiceInteractionContext"
+    ],
+    "DataSyncManager": [
+      "CoreDataManager",
+      "AppError"
+    ],
+    "SpeechManager": [
+      "AppError"
+    ],
+    "AnalyticsManager": [
+      "AppError"
+    ],
+    "AccessControl": [
+      "CaregiverAccess",
+      "AppError",
+      "FirebaseManager"
+    ],
+    "TestingView": [
+      "SyncTestRunner"
+    ],
+    "SyncTestRunner": [
+      "CoreDataManager",
+      "DataSyncManager",
+      "FirebaseManager"
+    ],
+    "VoiceCommandButton": [
+      "VoiceInteractionContext",
+      "VoiceInteractionManager"
+    ],
+    "AIAnalysisCard": [
+      "MedicationConflict",
+      "AnalyticsManager",
+      "ClaudeAIClient"
+    ],
+    "VoiceFirstInputView": [
+      "AppError",
+      "AnalyticsManager",
+      "MedicationAutocompleteField",
+      "VoiceInteractionManager",
+      "VoiceInteractionContext"
+    ],
+    "VoiceInputButton": [
+      "VoiceInteractionContext",
+      "SpeechManager"
+    ],
+    "CaregiverTaskSection": [
+      "UserModeManager",
+      "FirebaseManager",
+      "CaregiverTaskManager",
+      "CaregiverTask"
+    ],
+    "MedicationAutocompleteField": [
+      "MedicalVocabularyHelper"
+    ],
+    "SyncStatusView": [
+      "DataSyncManager"
+    ],
+    "SiriTipsView": [
+      "AppStrings"
+    ],
+    "ActionButton": [
+      "VoiceInteractionContext"
+    ],
+    "TaskCompletionSheet": [
+      "CaregiverTask"
+    ],
+    "SyncActionButton": [
+      "DataSyncManager"
+    ],
+    "DIUsageExample": [
+      "DIContainer"
+    ],
+    "MockImplementations": [
+      "UserProfile",
+      "User",
+      "AppError",
+      "ViewFactoryProtocol",
+      "DIContainer",
+      "CaregiverTask",
+      "MedicationConflict"
+    ],
+    "DIContainer": [
+      "User",
+      "AppError",
+      "DoctorListViewModel",
+      "ViewFactoryProtocol",
+      "MyHealthViewModel",
+      "GroupsViewModel",
+      "ConflictsViewModel"
+    ],
+    "MedicationManagerApp": [
+      "DIContainer",
+      "AnalyticsManager",
+      "AppViewFactory",
+      "FirebaseManager",
+      "NavigationManager"
+    ],
+    "AppViewFactory": [
+      "ViewFactoryProtocol"
+    ],
+    "ContentView": [
+      "NavigationManager",
+      "FirebaseManager",
+      "AppViewFactory"
+    ],
+    "SettingsView": [
+      "FirebaseManager"
+    ],
+    "EditSupplementView": [
+      "CoreDataManager",
+      "FirebaseManager",
+      "AppStrings"
+    ],
+    "SupplementDetailView": [
+      "CoreDataManager",
+      "AnalyticsManager",
+      "FirebaseManager",
+      "MedicationConflict",
+      "NavigationManager",
+      "ConflictDetectionManager"
+    ],
+    "AddSupplementView": [
+      "MedicationConflict",
+      "CoreDataManager",
+      "ConflictDetectionManager",
+      "FirebaseManager"
+    ],
+    "TaskHistoryView": [
+      "UserModeManager",
+      "FirebaseManager",
+      "CaregiverTaskManager",
+      "CaregiverTask"
+    ],
+    "AddMedicationView": [
+      "MedicationConflict",
+      "CoreDataManager",
+      "ConflictDetectionManager",
+      "FirebaseManager"
+    ],
+    "MedicationDetailView": [
+      "CoreDataManager",
+      "ClaudeAIClient",
+      "FirebaseManager",
+      "MedicationConflict",
+      "ConflictDetectionManager"
+    ],
+    "EditMedicationView": [
+      "CoreDataManager",
+      "FirebaseManager"
+    ],
+    "MyHealthMainContent": [
+      "MyHealthViewModel",
+      "NavigationManager"
+    ],
+    "MyHealthView": [
+      "MyHealthViewModel",
+      "NavigationManager",
+      "VoiceInteractionContext",
+      "FirebaseManager"
+    ],
+    "MyHealthViewModel": [
+      "AppError",
+      "DataSyncManager",
+      "CoreDataManager",
+      "AnalyticsManager",
+      "FirebaseManager"
+    ],
+    "QuickActionsSection": [
+      "NavigationManager"
+    ],
+    "MyHealthSupportingViews": [
+      "DataSyncManager"
+    ],
+    "GroupsView": [
+      "GroupsViewModel",
+      "NavigationManager",
+      "AccessControl"
+    ],
+    "GroupsViewModel": [
+      "AccessControl",
+      "AppError",
+      "FirebaseManager",
+      "AnalyticsManager"
+    ],
+    "DietEntryDetailView": [
+      "CoreDataManager",
+      "NavigationManager",
+      "AnalyticsManager",
+      "FirebaseManager"
+    ],
+    "EditDietEntryView": [
+      "CoreDataManager",
+      "FirebaseManager"
+    ],
+    "AddDietEntryView": [
+      "CoreDataManager",
+      "FirebaseManager"
+    ],
+    "ConflictsViewModel": [
+      "User",
+      "AppError",
+      "DataSyncManager",
+      "CoreDataManager",
+      "AnalyticsManager",
+      "FirebaseManager",
+      "MedicationConflict",
+      "VoiceInteractionManager",
+      "ConflictDetectionManager"
+    ],
+    "ConflictDetailView": [
+      "CoreDataManager",
+      "AnalyticsManager",
+      "FirebaseManager",
+      "MedicationConflict",
+      "NavigationManager",
+      "ConflictDetectionManager"
+    ],
+    "VoiceQueryView": [
+      "AnalyticsManager"
+    ],
+    "ConflictAnalysisView": [
+      "ClaudeAIClient",
+      "AnalyticsManager",
+      "AppStrings"
+    ],
+    "ConflictHistoryView": [
+      "ConflictDetectionManager",
+      "AnalyticsManager"
+    ],
+    "ConflictsView": [
+      "FirebaseManager",
+      "MedicationConflict",
+      "NavigationManager",
+      "SiriIntentsManager",
+      "ConflictsViewModel"
+    ],
+    "SummaryContent": [
+      "ClaudeAIClient"
+    ],
+    "RecommendationsContent": [
+      "ClaudeAIClient"
+    ],
+    "ConflictsContent": [
+      "ClaudeAIClient"
+    ],
+    "AnalysisHeaderCard": [
+      "ClaudeAIClient"
+    ],
+    "ActionsSection": [
+      "ClaudeAIClient",
+      "AppStrings"
+    ],
+    "EditUserProfileView": [
+      "UserProfile",
+      "FirebaseManager"
+    ],
+    "VoiceInputSheet": [
+      "NavigationManager",
+      "VoiceInteractionContext",
+      "VoiceInteractionManager"
+    ],
+    "EditDoctorView": [
+      "CoreDataManager",
+      "FirebaseManager"
+    ],
+    "AddDoctorView": [
+      "CoreDataManager",
+      "FirebaseManager"
+    ],
+    "DoctorDetailView": [
+      "CoreDataManager",
+      "AnalyticsManager",
+      "FirebaseManager"
+    ],
+    "DoctorListViewModel": [
+      "AppError",
+      "DataSyncManager",
+      "CoreDataManager",
+      "AnalyticsManager",
+      "FirebaseManager"
+    ],
+    "DoctorListView": [
+      "NavigationManager",
+      "DoctorListViewModel"
+    ],
+    "MFASetupView": [
+      "FirebaseManager"
+    ],
+    "LoginView": [
+      "FirebaseManager"
+    ],
+    "AuthenticationView": [
+      "NavigationManager",
+      "AnalyticsManager",
+      "FirebaseManager"
+    ],
+    "PhoneAuthView": [
+      "FirebaseManager"
+    ],
+    "MFASignInView": [
+      "FirebaseManager"
+    ],
+    "OnboardingView": [
+      "FirebaseManager"
+    ],
+    "MedicationIntents": [
+      "Configuration"
+    ],
+    "MedicationIntentsImplementation": [
+      "MedicationIntentEntity",
+      "MedicationFrequencyEntity"
+    ],
+    "BaseIntentProtocol": [
+      "Configuration"
+    ],
+    "IntentError": [
+      "User",
+      "Medication"
+    ],
+    "IntentLogger": [
+      "Configuration"
+    ]
+  },
+  "total_files_analyzed": 132
+}
